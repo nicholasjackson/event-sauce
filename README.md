@@ -84,17 +84,20 @@ attempts to match a value on an data object using dot notation e.g. given the be
 }
 ```
 name.firstname=nic% would match this message
+```
 = equality matcher
 != inequality matcher
 > greater than (number)
 < less than (number)
 %wildcard
-
+```
 ### Array matcher 
+```
 [first] = first index
 [any] = match any index
 [last] = last index
 [2] = 3rd index
+```
 
 ### Array matchers can be combined with object matchers like...
-data[any]=(name.firstname=nic%)
+`data[any]=(name.firstname=nic%)`
