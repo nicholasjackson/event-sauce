@@ -7,6 +7,8 @@ event-sauce_test:
   links:
     - consul:consul
     - statsd:statsd
+    - mongo:mongo
+    - redis:redis
 consul:
   image: progrium/consul
   ports:
@@ -15,6 +17,22 @@ consul:
     - "9600:53/udp"
   hostname: node1
   command: "-server -bootstrap -ui-dir /ui"
+data:
+  image: 'busybox:latest'
+  tags:
+    - DevCluster
+  volumes:
+    - /etc/db
+mongo:
+  image: 'mongo:latest'
+  ports:
+    - '27017:27017'
+  volumes_from:
+    - data
+redis:
+  image: 'redis:latest'
+  ports:
+    - '6380:6380'
 statsd:
   image: hopsoft/graphite-statsd
   ports:
@@ -22,4 +40,3 @@ statsd:
     - "2003:2003"
     - "8125:8125/udp"
     - "8126:8126"
-

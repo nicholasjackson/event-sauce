@@ -1,11 +1,12 @@
 swagger: '2.0'
 info:
-  title: event-sauce API
-  description: event-sauce API Description
+  title: Event Sauce API
+  description: Event Sauce is a simple Event Sourcing system, the API allows the registration of consumers for events and also allows clients to send an event which is then dispatched to the registered consumers.
   version: 1.0.0
 host: api.test.com
 schemes:
   - http
+  - https
 basePath: /v1
 produces:
   - application/json
@@ -22,13 +23,87 @@ paths:
         '200':
           description: Status message from server describing current health
           schema:
-            type: array
-            items:
-              $ref: '#/definitions/HealthResponse'
+            type: object
+            $ref: '#/definitions/Response'
+  /register:
+    post:
+      summary: Register Consumer
+      description: |
+        The register endpoint allows consumers to register with the event store.
+      tags:
+        - Register
+      parameters:
+        - name: RegistrationRequest
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/RegistrationRequest'
+      responses:
+        '200':
+          description: Successfull registration of a consumer
+          schema:
+            type: object
+            $ref: '#/definitions/Response'
+        '500':
+          description: Unsuccessful registration of a consumer
+          schema:
+            type: object
+            $ref: '#/definitions/Response'
+  /event:
+    post:
+      summary: Add a event to the queue
+      description: |
+        The event endpoint allows messages to be added to the event store, when a message is received it will be queued for dispatch to any consumers.
+      tags:
+        - Event
+      parameters:
+        - name: EventRequest
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/EventRequest'
+      responses:
+        '200':
+          description: Successfull receipt of an event
+          schema:
+            type: object
+            $ref: '#/definitions/Response'
+        '500':
+          description: Unsuccessful receipt of an event
+          schema:
+            $ref: '#/definitions/Response'
 definitions:
-  HealthResponse:
+  Response:
     type: object
     properties:
       status_message:
         type: string
-        description: 'Plain text readable response corresponding to current health status'
+        description: 'Plain text readable response'
+  RegistrationRequest:
+    type: object
+    required:
+      - message
+      - health_url
+      - callback_url
+    properties:
+      message:
+        type: string
+        description: 'The name of the message to subscibe updates to'
+      health_url:
+        type: string
+        description: 'Url to check health of registered subsciber'
+      callback_url:
+        type: string
+        description: 'Callback Url that the server will POST the message to'
+  EventRequest:
+    type: object
+    required:
+      - message
+      - payload
+    properties:
+      message:
+        type: string
+        description: 'The name of the event'
+      payload:
+        type: string
+        description: 'Payload for the message represented as a string'
