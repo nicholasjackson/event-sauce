@@ -1,0 +1,7 @@
+# binaries
+server
+
+# other
+.DS_Store
+_build/swagger_spec/index.html
+_build/dockerfile/event-sauce/swagger_spec
