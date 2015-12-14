@@ -19,8 +19,6 @@ consul:
   command: "-server -bootstrap -ui-dir /ui"
 data:
   image: 'busybox:latest'
-  tags:
-    - DevCluster
   volumes:
     - /etc/db
 mongo:
