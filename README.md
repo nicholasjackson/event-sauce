@@ -3,7 +3,7 @@ NOTES:
 Event Sauce is an open source distributed server for Event Sourcing, it performs the role of event store and pub sub queue using REST
 
 ## This document is work in progress the current API spec can be found at the below location
-()[]
+()[http://htmlpreview.github.io/?]
 
 The system is made up of a server and either one or more workers.
 
