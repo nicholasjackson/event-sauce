@@ -20,7 +20,8 @@ consul:
 data:
   image: 'busybox:latest'
   volumes:
-    - /etc/db
+    - /data/db
+  command: tail -f /dev/null
 mongo:
   image: 'mongo:latest'
   ports:

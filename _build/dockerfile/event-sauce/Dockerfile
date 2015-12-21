@@ -14,7 +14,9 @@ chmod -R 755 /etc/s6
 ADD config.ctmpl /event-sauce/config.ctmpl
 
 # Add server files
-ADD swagger_spec /swagger
+RUN mkdir /swagger
+ADD swagger_spec/swagger.yml /swagger
+ADD swagger_spec/docs /swagger
 ADD server /event-sauce/server
 
 RUN chmod 755 /event-sauce/server

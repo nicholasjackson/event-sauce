@@ -82,7 +82,7 @@ definitions:
   RegistrationRequest:
     type: object
     required:
-      - message
+      - message_name
       - health_url
       - callback_url
     properties:
