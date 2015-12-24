@@ -1,4 +1,4 @@
-event-sauce-test:
+eventsaucetest:
   image: event-sauce
   ports:
     - "8001:8001"
