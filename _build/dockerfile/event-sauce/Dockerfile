@@ -15,7 +15,7 @@ ADD config.ctmpl /event-sauce/config.ctmpl
 
 # Add server files
 RUN mkdir /swagger
-ADD swagger_spec/swagger.yml /swagger
+ADD swagger_spec/swagger.yml /swagger/swagger.yml
 ADD server /event-sauce/server
 
 RUN chmod 755 /event-sauce/server
