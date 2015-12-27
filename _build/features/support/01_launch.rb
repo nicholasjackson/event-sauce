@@ -10,10 +10,3 @@ After do |scenario|
   end
 
 end
-
-begin
-  e = $! # last exception
-ensure
-  puts 'arse' if $! != e
-  raise e if $! != e
-end

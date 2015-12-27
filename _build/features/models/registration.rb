@@ -1,6 +1,10 @@
 class Registration
   include Mongoid::Document
-  field :_id, type: Moped::BSON::ObjectId
+  field :_id,           type: Moped::BSON::ObjectId
+  field :message_name,  type: String
+  field :health_url,    type: String
+  field :callback_url,  type: String
+  field :creation_date, type: DateTime   
 end
 
 FactoryGirl.define do

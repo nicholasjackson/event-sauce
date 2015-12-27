@@ -8,6 +8,10 @@ Scenario: Invalid GET request
   Given I send a GET request to "/v1/register"
   Then the response status should be "404"
 
+Scenario: Invalid POST request
+	Given I send a POST request to "/v1/register"
+	Then the response status should be "400"
+
 Scenario: Register endpoint with correct data registers consumer successfully
 	Given I send a POST request to "/v1/register" with the following:
 	"""
@@ -19,7 +23,7 @@ Scenario: Register endpoint with correct data registers consumer successfully
 	"""
 	Then the response status should be "200"
 	And the JSON response should have "$..status_message" with the text "OK"
-  And a registration should exist with message_name: "testmessage.register"
+  And registration should exist with message_name: "testmessage.register"
 
 Scenario: Register endpoint with no callback returns error
 	Given I send a POST request to "/v1/register" with the following:
@@ -31,7 +35,7 @@ Scenario: Register endpoint with no callback returns error
 	"""
 	Then the response status should be "500"
 	And the JSON response should have "$..status_message" with the text "No callback defined"
-  And a registration should not exist
+  And registration should not exist
 
 Scenario: Register endpoint with no health check returns error
 	Given I send a POST request to "/v1/register" with the following:
@@ -43,4 +47,4 @@ Scenario: Register endpoint with no health check returns error
 	"""
 	Then the response status should be "500"
   And the JSON response should have "$..status_message" with the text "No healthcheck defined"
-  And a registration should not exist
+  And registration should not exist

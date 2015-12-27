@@ -4,11 +4,12 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+
 	"github.com/nicholasjackson/event-sauce/global"
 	"github.com/nicholasjackson/event-sauce/handlers"
 
+	"github.com/alexcesaro/statsd"
 	"github.com/facebookgo/inject"
-	 "github.com/alexcesaro/statsd"
 )
 
 func main() {
@@ -29,30 +30,18 @@ func setupHandlers() {
 }
 
 func setupInjection() {
-	var g inject.Graph
 
-	var err error
-
-	
-	statsdClient, err := statsd.New(global.Config.StatsDServerIP) // reference to a statsd client
+	statsDClient, err := statsd.New(global.Config.StatsDServerIP) // reference to a statsd client
 	if err != nil {
 		panic(fmt.Sprintln("Unable to create StatsD Client: ", err))
 	}
-	
 
-	err = g.Provide(
+	err = global.SetupInjection(
 		&inject.Object{Value: handlers.HealthHandlerDependencies},
-		&inject.Object{Value: statsdClient, Name: "statsd"},
+		&inject.Object{Value: statsDClient, Name: "statsd"},
 	)
-
 	if err != nil {
-		fmt.Println(err)
+		panic(fmt.Sprintln("Unable to create injection framework: ", err))
 	}
 
-	// Here the Populate call is creating instances of NameAPI &
-	// PlanetAPI, and setting the HTTPTransport on both to the
-	// http.DefaultTransport provided above:
-	if err := g.Populate(); err != nil {
-		fmt.Println(err)
-	}
 }
