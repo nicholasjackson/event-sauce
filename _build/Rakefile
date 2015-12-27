@@ -33,16 +33,3 @@ GO_CONTAINER_ARGS = {
 	:working_directory => "/go/src/#{GONAMESPACE}/#{DOCKER_IMAGE_NAME}",
 	:command => ['/bin/bash']
 }
-
-SWAGGER_CONTAINER_ARGS = {
-	:image => 'sandcastle/swagger-codegen-docker',
-	:binds => [
-		"#{ROOTFOLDER}/_build/swagger_spec:/spec",
-		"#{ROOTFOLDER}/_build/swagger_spec:/gen",
-	],
-	:env => [
-		'SWAGGER_FILE=swagger.yml',
-		'LANGUAGE=dynamic-html'
-	],
-	:command => ['/bin/bash']
-}

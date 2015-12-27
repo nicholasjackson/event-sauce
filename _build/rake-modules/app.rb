@@ -29,17 +29,6 @@ namespace :app do
   	end
   end
 
-  desc "generate Swagger documentation"
-  task :docs do
-  	begin
-  		container = get_container SWAGGER_CONTAINER_ARGS
-  		ret = container.exec(['/src/run.sh']) { |stream, chunk| puts "#{stream}: #{chunk}" }
-  		raise Exception, 'Error running command' unless ret[2] == 0
-  	ensure
-  		container.delete(:force => true)
-  	end
-  end
-
   desc "build and test application"
   task :build => [:fetch_images, :test] do
   	p "Build for Linux"
@@ -61,7 +50,6 @@ namespace :app do
   	FileUtils.cp "#{GOPATH}/src/#{GONAMESPACE}/#{DOCKER_IMAGE_NAME}/server", "./dockerfile/#{DOCKER_IMAGE_NAME}/server"
   	Dir.mkdir "./dockerfile/#{DOCKER_IMAGE_NAME}/swagger_spec/" unless Dir.exist? "./dockerfile/#{DOCKER_IMAGE_NAME}/swagger_spec/"
   	FileUtils.cp "./swagger_spec/swagger.yml", "./dockerfile/#{DOCKER_IMAGE_NAME}/swagger_spec/swagger.yml"
-  	FileUtils.cp_r "./swagger_spec/docs", "./dockerfile/#{DOCKER_IMAGE_NAME}/swagger_spec"
 
   	Docker.options = {:read_timeout => 6200}
   	image = Docker::Image.build_from_dir "./dockerfile/#{DOCKER_IMAGE_NAME}", {:t => DOCKER_IMAGE_NAME}

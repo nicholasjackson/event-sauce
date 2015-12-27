@@ -3,6 +3,7 @@ Then(/^a #{capture_model} should exist with #{capture_fields} "(.*?)"$/) do |mod
   puts u
 end
 
-Then(/^a registration should not exist$/) do
-  pending # express the regexp above with the code you wish you had
+Then(/^a #{capture_model} should not exist$/) do |model_name|
+  u = find_model(model_name)
+  puts u
 end
