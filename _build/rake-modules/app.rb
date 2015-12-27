@@ -98,13 +98,14 @@ namespace :app do
   		self.wait_until_server_running ENV['WEB_SERVER_URI']
 
   		p 'Running Tests'
-  		puts `cucumber --color #{feature}`
+  		puts `cucumber --color --strict -f pretty #{feature}`
   	ensure
       p 'Stopping Application'
   		# remove stop running application
   		puts `docker-compose -f ./dockercompose/#{DOCKER_IMAGE_NAME}/docker-compose.yml stop`
   		# remove stopped containers
   		puts `echo y | docker-compose -f ./dockercompose/#{DOCKER_IMAGE_NAME}/docker-compose.yml rm`
+      abort "Cucumber steps failed" unless $FAILED == 0
   	end
   end
 
