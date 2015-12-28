@@ -44,11 +44,10 @@ paths:
           schema:
             type: object
             $ref: '#/definitions/Response'
-        '500':
-          description: Unsuccessful registration of a consumer
-          schema:
-            type: object
-            $ref: '#/definitions/Response'
+        '400':
+          description: Bad request, possible invalid request object
+        '304':
+          description: Registration already exists
   /event:
     post:
       summary: Add a event to the queue
@@ -83,15 +82,11 @@ definitions:
     type: object
     required:
       - message_name
-      - health_url
       - callback_url
     properties:
       message:
         type: string
         description: 'The name of the message to subscibe updates to'
-      health_url:
-        type: string
-        description: 'Url to check health of registered subsciber'
       callback_url:
         type: string
         description: 'Callback Url that the server will POST the message to'

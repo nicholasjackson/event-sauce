@@ -1,6 +1,6 @@
 development:
   sessions:
     default:
-      database: event_sauce
+      database: event-sauce
       hosts:
         - <%= ENV['MONGO_URI'] %>

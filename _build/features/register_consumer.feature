@@ -14,37 +14,24 @@ Scenario: Invalid POST request
 
 Scenario: Register endpoint with correct data registers consumer successfully
 	Given I send a POST request to "/v1/register" with the following:
-	"""
-	{
-		"message_name": "testmessage.register",
-		"health_url": "http://something.something/v1/health",
-		"callback_url": "http://something.something/v1/callback"
-	}
-	"""
+		| message_name | testmessage.register                   |
+		| callback_url | http://something.something/v1/callback |
 	Then the response status should be "200"
 	And the JSON response should have "$..status_message" with the text "OK"
   And registration should exist with message_name: "testmessage.register"
 
-Scenario: Register endpoint with no callback returns error
+Scenario: Register endpoint with no callback_url returns error
 	Given I send a POST request to "/v1/register" with the following:
-	"""
-	{
-		"message_name": "testmessage.register",
-		"health_url": "http://something.something/v1/health"
-	}
-	"""
-	Then the response status should be "500"
-	And the JSON response should have "$..status_message" with the text "No callback defined"
-  And registration should not exist
+		| message_name | testmessage.register                   |
+	Then the response status should be "400"
+  And 0 registrations should exist
 
-Scenario: Register endpoint with no health check returns error
-	Given I send a POST request to "/v1/register" with the following:
-	"""
-	{
-		"message_name": "testmessage.register",
-		"callback_url": "http://something.something/v1/callback"
-	}
-	"""
-	Then the response status should be "500"
-  And the JSON response should have "$..status_message" with the text "No healthcheck defined"
-  And registration should not exist
+Scenario: Register endpoint with correct data when registration exists returns 304
+		Given the following registrations exist
+			| message_name         | callback_url                           |
+			| testmessage.register | http://something.something/v1/callback |
+		When I send a POST request to "/v1/register" with the following:
+			| message_name | testmessage.register                   |
+			| callback_url | http://something.something/v1/callback |
+		Then the response status should be "304"
+	  And 1 registrations should exist with message_name: "testmessage.register"

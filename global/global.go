@@ -9,8 +9,14 @@ import (
 )
 
 type ConfigStruct struct {
-	StatsDServerIP string
-	RootFolder     string
+	StatsDServerIP string    `json:"stats_d_server_url"`
+	RootFolder     string    `json:"root_folder"`
+	Data           DataStore `json:"data_store"`
+}
+
+type DataStore struct {
+	ConnectionString string `json:"connection_string"`
+	DataBaseName     string `json:"database_name"`
 }
 
 var Config ConfigStruct

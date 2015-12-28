@@ -1,3 +1,7 @@
 {
-  "StatsDServerIP": {{key "StatsDServerIP"}}
+  "stats_d_server_url": {{key "/api/eventsauce/stats_d_server_url"}},
+  "data_store": {
+    "connection_string": {{key "/api/eventsauce/data_store/connection_string"}},
+    "database_name": {{key "/api/eventsauce/data_store/database_name"}}
+  }
 }
