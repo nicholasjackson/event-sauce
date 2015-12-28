@@ -101,7 +101,7 @@ namespace :app do
   	  puts `docker-compose -f ./dockercompose/#{DOCKER_IMAGE_NAME}/docker-compose.yml up -d`
       sleep 2
   		setConsulVariables host, 9500
-  		self.wait_until_server_running ENV['WEB_SERVER_URI']
+  		self.wait_until_server_running ENV['WEB_SERVER_URI'], 0
 
   		p 'Running Tests'
   		puts `cucumber --color -f pretty #{feature}`
