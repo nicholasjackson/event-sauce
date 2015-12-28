@@ -57,10 +57,15 @@ namespace :app do
 
   desc "run application with Docker Compose"
   task :run do
+    host = get_docker_ip_address
+    ENV['WEB_SERVER_URI'] = "http://#{host}:8001"
+  	ENV['MONGO_URI'] = "#{host}:27017"
+  	ENV['EMAIL_SERVER_URI'] = "http://#{host}:1080"
+
   	begin
       puts `docker-compose -f ./dockercompose/#{DOCKER_IMAGE_NAME}/docker-compose.yml up -d`
       sleep 2
-  		setConsulVariables get_docker_ip_address, 9500
+  		setConsulVariables host, 9500
 
       sh "docker-compose -f ./dockercompose/#{DOCKER_IMAGE_NAME}/docker-compose.yml logs"
   	rescue SystemExit, Interrupt
@@ -74,10 +79,9 @@ namespace :app do
   task :build_and_run => [:build_server, :run]
 
   desc "run end to end Cucumber tests"
-  task :e2e do
-  	feature = ARGV.last
-  	if feature != "app:e2e"
-  		feature = "--tags #{feature}"
+  task :e2e, [:feature] do |t, args|
+  	if args[:feature] != nil
+  		feature = "--tags #{args[:feature]}"
   	else
   		feature = ""
   	end
@@ -90,6 +94,8 @@ namespace :app do
   	ENV['MONGO_URI'] = "#{host}:27017"
   	ENV['EMAIL_SERVER_URI'] = "http://#{host}:1080"
 
+    status = 0
+
     puts "Running Tests"
   	begin
   	  puts `docker-compose -f ./dockercompose/#{DOCKER_IMAGE_NAME}/docker-compose.yml up -d`
@@ -98,14 +104,15 @@ namespace :app do
   		self.wait_until_server_running ENV['WEB_SERVER_URI']
 
   		p 'Running Tests'
-  		puts `cucumber --color --strict -f pretty #{feature}`
+  		puts `cucumber --color -f pretty #{feature}`
+      status = $?.exitstatus
   	ensure
       p 'Stopping Application'
   		# remove stop running application
-  		#puts `docker-compose -f ./dockercompose/#{DOCKER_IMAGE_NAME}/docker-compose.yml stop`
+  		puts `docker-compose -f ./dockercompose/#{DOCKER_IMAGE_NAME}/docker-compose.yml stop`
   		# remove stopped containers
-  		#puts `echo y | docker-compose -f ./dockercompose/#{DOCKER_IMAGE_NAME}/docker-compose.yml rm`
-      abort "Cucumber steps failed" unless $FAILED == 0
+  		puts `echo y | docker-compose -f ./dockercompose/#{DOCKER_IMAGE_NAME}/docker-compose.yml rm`
+      abort "Cucumber steps failed" unless status == 0
   	end
   end
 
