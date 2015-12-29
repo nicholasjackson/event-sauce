@@ -39,3 +39,12 @@ func (m *MockDal) DeleteRegistration(registration *entities.Registration) error 
 	m.DeleteObject = registration
 	return args.Error(0)
 }
+
+type MockQueue struct {
+	mock.Mock
+}
+
+func (m *MockQueue) Add(message_name string, payload string) error {
+	args := m.Mock.Called(message_name, payload)
+	return args.Error(0)
+}

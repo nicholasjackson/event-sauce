@@ -75,6 +75,7 @@ GEM
       method_source (~> 0.8.1)
       slop (~> 3.4)
     rake (10.4.2)
+    redis (3.2.2)
     representable (2.4.1)
       declarative (~> 0.0.5)
       uber (~> 0.0.15)
@@ -114,6 +115,7 @@ DEPENDENCIES
   pickle-mongodb (~> 0.5)
   pry (~> 0.10.3)
   rake
+  redis (~> 3.2)
 
 BUNDLED WITH
    1.11.2

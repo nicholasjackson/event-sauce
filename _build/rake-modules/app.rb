@@ -92,6 +92,8 @@ namespace :app do
 
   	ENV['WEB_SERVER_URI'] = "http://#{host}:8001"
   	ENV['MONGO_URI'] = "#{host}:27017"
+    ENV['REDIS_IP'] = host
+    ENV['REDIS_PORT'] = "6379"
   	ENV['EMAIL_SERVER_URI'] = "http://#{host}:1080"
 
     status = 0

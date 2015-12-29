@@ -10,8 +10,11 @@ func GetRouter() *pat.Router {
 	r := pat.New()
 
 	r.Get("/v1/health", HealthHandler)
+
 	r.Post("/v1/register", RegisterCreateHandler)
 	r.Delete("/v1/register", RegisterDeleteHandler)
+
+	r.Post("/v1/event", EventHandler)
 
 	//Add routing for static routes
 	s := http.StripPrefix("/swagger/", http.FileServer(http.Dir("/swagger")))

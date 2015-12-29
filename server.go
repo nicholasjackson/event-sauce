@@ -9,6 +9,7 @@ import (
 	"github.com/nicholasjackson/event-sauce/global"
 	"github.com/nicholasjackson/event-sauce/handlers"
 	"github.com/nicholasjackson/event-sauce/logging"
+	"github.com/nicholasjackson/event-sauce/queue"
 
 	"github.com/alexcesaro/statsd"
 	"github.com/facebookgo/inject"
@@ -35,8 +36,10 @@ func setupInjection() {
 	err := global.SetupInjection(
 		&inject.Object{Value: handlers.HealthHandlerDependencies},
 		&inject.Object{Value: handlers.RegisterHandlerDependencies},
+		&inject.Object{Value: handlers.EventHandlerDependencies},
 		&inject.Object{Value: createStatsDClient(), Name: "statsd"},
 		&inject.Object{Value: createMongoClient(), Name: "dal"},
+		&inject.Object{Value: createRedisClient(), Name: "queue"},
 	)
 
 	if err != nil {
@@ -59,4 +62,12 @@ func createMongoClient() *data.MongoDal {
 		panic(fmt.Sprintln("Unable to create DataBase: ", err))
 	}
 	return dal
+}
+
+func createRedisClient() *queue.RedisQueue {
+	queue, err := queue.New(global.Config.Queue.ConnectionString, global.Config.Queue.MessageQueue)
+	if err != nil {
+		panic(fmt.Sprintln("Unable to create Queue: ", err))
+	}
+	return queue
 }

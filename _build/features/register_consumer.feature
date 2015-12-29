@@ -1,4 +1,4 @@
-@register_consumer
+@register_consumer @implemented
 Feature: Register Consumer
 	In order to ensure quality
 	As a user

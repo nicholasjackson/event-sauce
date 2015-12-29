@@ -4,5 +4,7 @@ require 'cucumber/pickle_mongodb'
 require 'cucumber/mailcatcher'
 
 $SERVER_PATH = ENV['WEB_SERVER_URI']
+$REDIS_IP = ENV['REDIS_IP']
+$REDIS_PORT = ENV['REDIS_PORT']
 
 Mongoid.load!('features/support/localdb.yml', :development)

@@ -89,10 +89,8 @@ paths:
           schema:
             type: object
             $ref: '#/definitions/Response'
-        '500':
-          description: Unsuccessful receipt of an event
-          schema:
-            $ref: '#/definitions/Response'
+        '400':
+          description: Bad request, possible invalid request object
 definitions:
   Response:
     type: object
@@ -115,10 +113,10 @@ definitions:
   EventRequest:
     type: object
     required:
-      - message
+      - message_name
       - payload
     properties:
-      message:
+      message_name:
         type: string
         description: 'The name of the event'
       payload:

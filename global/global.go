@@ -12,11 +12,17 @@ type ConfigStruct struct {
 	StatsDServerIP string    `json:"stats_d_server_url"`
 	RootFolder     string    `json:"root_folder"`
 	Data           DataStore `json:"data_store"`
+	Queue          Queue     `json:"queue"`
 }
 
 type DataStore struct {
 	ConnectionString string `json:"connection_string"`
 	DataBaseName     string `json:"database_name"`
+}
+
+type Queue struct {
+	ConnectionString string `json:"connection_string"`
+	MessageQueue     string `json:"message_queue"`
 }
 
 var Config ConfigStruct

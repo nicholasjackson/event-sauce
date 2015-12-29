@@ -3,5 +3,9 @@
   "data_store": {
     "connection_string": {{key "/api/eventsauce/data_store/connection_string"}},
     "database_name": {{key "/api/eventsauce/data_store/database_name"}}
+  },
+  "queue": {
+    "connection_string": {{key "/api/eventsauce/queue/connection_string"}},
+    "message_queue": {{key "/api/eventsauce/queue/message_queue"}}
   }
 }
