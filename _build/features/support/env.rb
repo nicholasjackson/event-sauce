@@ -1,4 +1,5 @@
 require 'cucumber/rest_api'
+require_relative 'cucumber_rest_monkey_patch'
 require 'cucumber/pickle_mongodb'
 require 'cucumber/mailcatcher'
 

@@ -23,10 +23,11 @@ type RegisterDependencies struct {
 
 var RegisterHandlerDependencies *RegisterDependencies = &RegisterDependencies{}
 
-const REGISTER_HANDLER_CALLED = "event-sauce.health_handler"
+const REGISTER_CREATE_HANDLER_CALLED = "event-sauce.register_handler.create"
+const REGISTER_DELETE_HANDLER_CALLED = "event-sauce.register_handler.delete"
 
-func RegisterHandler(rw http.ResponseWriter, r *http.Request) {
-	RegisterHandlerDependencies.Stats.Increment(REGISTER_HANDLER_CALLED)
+func RegisterCreateHandler(rw http.ResponseWriter, r *http.Request) {
+	RegisterHandlerDependencies.Stats.Increment(REGISTER_CREATE_HANDLER_CALLED)
 
 	defer r.Body.Close()
 	data, _ := ioutil.ReadAll(r.Body)
@@ -53,4 +54,34 @@ func RegisterHandler(rw http.ResponseWriter, r *http.Request) {
 
 	encoder := json.NewEncoder(rw)
 	encoder.Encode(&response)
+}
+
+func RegisterDeleteHandler(rw http.ResponseWriter, r *http.Request) {
+	RegisterHandlerDependencies.Stats.Increment(REGISTER_DELETE_HANDLER_CALLED)
+
+	defer r.Body.Close()
+	data, _ := ioutil.ReadAll(r.Body)
+	request := RegisterRequest{}
+
+	err := json.Unmarshal(data, &request)
+	if err != nil || request.MessageName == "" || request.CallbackUrl == "" {
+		http.Error(rw, "Invalid request object", http.StatusBadRequest)
+		return
+	}
+
+	if r, _ := RegisterHandlerDependencies.Dal.GetRegistrationByMessageAndCallback(
+		request.MessageName, request.CallbackUrl); r != nil {
+		if err = RegisterHandlerDependencies.Dal.DeleteRegistration(r); err != nil {
+			http.Error(rw, "Unable to delete request object", http.StatusInternalServerError)
+			return
+		}
+
+		var response BaseResponse
+		response.StatusMessage = "OK"
+
+		encoder := json.NewEncoder(rw)
+		encoder.Encode(&response)
+	} else {
+		http.Error(rw, "Registration not found", http.StatusNotFound)
+	}
 }

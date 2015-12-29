@@ -10,7 +10,7 @@ eventsauce:
     - mongo:mongo
     - redis:redis
 consul:
-  image: progrium/consul
+  image: 'progrium/consul:latest'
   ports:
     - "9400:8400"
     - "9500:8500"
@@ -33,7 +33,7 @@ redis:
   ports:
     - '6380:6380'
 statsd:
-  image: hopsoft/graphite-statsd
+  image: 'hopsoft/graphite-statsd:latest'
   ports:
     - "8180:80"
     - "2003:2003"

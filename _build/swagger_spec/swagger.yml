@@ -48,6 +48,28 @@ paths:
           description: Bad request, possible invalid request object
         '304':
           description: Registration already exists
+    delete:
+      summary: Remove Consumer
+      description: |
+        The register endpoint allows consumers to remove subscriptions from the event store.
+      tags:
+        - Register
+      parameters:
+        - name: RegistrationRequest
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/RegistrationRequest'
+      responses:
+        '200':
+          description: Successfull removal
+          schema:
+            type: object
+            $ref: '#/definitions/Response'
+        '400':
+          description: Bad request, possible invalid request object
+        '404':
+          description: Registration does not exist
   /event:
     post:
       summary: Add a event to the queue

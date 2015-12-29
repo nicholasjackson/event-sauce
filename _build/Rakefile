@@ -23,7 +23,7 @@ GONAMESPACE = 'github.com/nicholasjackson'
 ROOTFOLDER = Pathname.new(Dir.pwd).parent
 
 GO_CONTAINER_ARGS = {
-	:image => 'golang',
+	:image => 'golang:latest',
 	:binds => [
 		"#{GOPATH}/src:/go/src"
 	],

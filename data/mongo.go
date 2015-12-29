@@ -1,6 +1,7 @@
 package data
 
 import (
+	"fmt"
 	"log"
 
 	"labix.org/v2/mgo"
@@ -33,6 +34,16 @@ func (m *MongoDal) UpsertRegistration(registration *entities.Registration) error
 	session := m.mainSession.New()
 	c := session.DB(m.dataBaseName).C("registrations")
 	err := c.Insert(registration)
+
+	return err
+}
+
+func (m *MongoDal) DeleteRegistration(registration *entities.Registration) error {
+	log.Printf("Delete Registration: %v\n", registration)
+	session := m.mainSession.New()
+	c := session.DB(m.dataBaseName).C("registrations")
+	err := c.RemoveId(registration.Id)
+	fmt.Println("Error: ", err)
 
 	return err
 }
