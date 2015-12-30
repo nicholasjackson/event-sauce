@@ -54,7 +54,7 @@ Scenario: Dispatch a message to a multiple healthy consumers, should result in t
 		"""
 	Then I expect 2 callbacks to have been received with the correct payload
 
-Scenario: Dispatch a message to a one healthy one unhealthy consumers, should result in a message received by the healthy endpoint and the unhealthy endpoint being unregistered
+Scenario: Dispatch a message to a one healthy one nonexistent consumers, should result in a message received by the healthy endpoint and the unhealthy endpoint being unregistered
 	Given I send a POST request to "/v1/register" with the following:
 		| message_name | mytest.event                              |
 		| callback_url | http://192.168.99.100:11988/v1/helloworld |
@@ -74,3 +74,20 @@ Scenario: Dispatch a message to a one healthy one unhealthy consumers, should re
 	Then I expect 1 callbacks to have been received with the correct payload
 	And 1 registrations should exist with message_name: "testmessage.register", callback_url: "http://192.168.99.100:11988/v1/helloworld"
 	And 0 registrations should exist with message_name: "testmessage.register", callback_url: "http://badserver1231sdsd.com/v1/doesnotexist"
+
+Scenario: Dispatch an event to a one unhealth consumers, should result in an event added to the dead letter queue
+	Given I send a POST request to "/v1/register" with the following:
+		| message_name | mytest.event                              |
+		| callback_url | http://192.168.99.100:11988/v1/unhealthy  |
+	And the response status should be "200"
+	When I send a POST request to "/v1/event" with the following:
+		"""
+			{
+				"message_name": "mytest.event",
+				"payload": {
+					"something": "something"
+				}
+			}
+		"""
+	Then I expect 1 event on the dead letter queue
+	And 1 registrations should exist with message_name: "testmessage.register", callback_url: "http://192.168.99.100:11988/v1/helloworld"

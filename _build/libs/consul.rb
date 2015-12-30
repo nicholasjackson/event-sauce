@@ -9,5 +9,6 @@ def setConsulVariables host, port
   kvs.put('/api/eventsauce/data_store/database_name','event-sauce')
 
   kvs.put('/api/eventsauce/queue/connection_string','redis:6379')
-  kvs.put('/api/eventsauce/queue/message_queue','message_queue')
+  kvs.put('/api/eventsauce/queue/event_queue','event_queue')
+  kvs.put('/api/eventsauce/queue/dead_letter_queue','dead_letter_queue')
 end

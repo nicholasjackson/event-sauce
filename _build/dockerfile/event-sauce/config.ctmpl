@@ -6,6 +6,7 @@
   },
   "queue": {
     "connection_string": {{key "/api/eventsauce/queue/connection_string"}},
-    "message_queue": {{key "/api/eventsauce/queue/message_queue"}}
+    "event_queue": {{key "/api/eventsauce/queue/event_queue"}},
+    "dead_letter_queue": {{key "/api/eventsauce/queue/dead_letter_queue"}}
   }
 }
