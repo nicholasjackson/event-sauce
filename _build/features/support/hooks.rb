@@ -3,6 +3,7 @@ require 'pry'
 Before do |scenario|
   Registration.delete_all
   clear_queue
+  clearMimicStubs
 end
 
 After do |scenario|
