@@ -95,6 +95,7 @@ namespace :app do
     ENV['REDIS_IP'] = host
     ENV['REDIS_PORT'] = "6379"
   	ENV['EMAIL_SERVER_URI'] = "http://#{host}:1080"
+    ENV['MIMIC_SERVER'] = "http://#{host}:11988"
 
     status = 0
 

@@ -40,3 +40,7 @@ statsd:
     - "2003:2003"
     - "8125:8125/udp"
     - "8126:8126"
+helloworldserver:
+  image: nicholasjackson/mimic-docker
+  ports:
+    - "11988:11988"
