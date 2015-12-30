@@ -23,8 +23,8 @@ type RegisterDependencies struct {
 
 var RegisterHandlerDependencies *RegisterDependencies = &RegisterDependencies{}
 
-const REGISTER_CREATE_HANDLER_CALLED = "event-sauce.register_handler.create"
-const REGISTER_DELETE_HANDLER_CALLED = "event-sauce.register_handler.delete"
+const REGISTER_CREATE_HANDLER_CALLED = "eventsauce.register_handler.create"
+const REGISTER_DELETE_HANDLER_CALLED = "eventsauce.register_handler.delete"
 
 func RegisterCreateHandler(rw http.ResponseWriter, r *http.Request) {
 	RegisterHandlerDependencies.Stats.Increment(REGISTER_CREATE_HANDLER_CALLED)

@@ -1,4 +1,4 @@
-@healthcheck @implemented
+@healthcheck
 Feature: Health check
 	In order to ensure quality
 	As a user

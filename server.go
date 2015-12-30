@@ -3,11 +3,14 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"sync"
 
 	"github.com/nicholasjackson/event-sauce/handlers"
 )
 
-func startApiServer() {
+func startApiServer(wg *sync.WaitGroup) {
+	defer wg.Done()
+
 	http.Handle("/", handlers.GetRouter())
 
 	fmt.Println("Listening for connections on port", 8001)

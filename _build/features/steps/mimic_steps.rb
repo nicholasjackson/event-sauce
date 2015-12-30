@@ -2,6 +2,7 @@ require 'rest_client'
 require 'json'
 
 Given(/^Mimic is configured with specification$/) do |specification|
+  clearMimicStubs
   RestClient.send("post", "#{$MIMIC_SERVER}/api/multi", "#{specification}")
 end
 

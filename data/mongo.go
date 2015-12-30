@@ -3,6 +3,7 @@ package data
 import (
 	"fmt"
 	"log"
+	"time"
 
 	"labix.org/v2/mgo"
 	"labix.org/v2/mgo/bson"
@@ -25,7 +26,27 @@ func New(connectionString string, dataBaseName string) (*MongoDal, error) {
 }
 
 func (m *MongoDal) GetRegistrationByMessageAndCallback(message string, callback_url string) (*entities.Registration, error) {
-	return findRegistration(bson.M{"message_name": message, "callback_url": callback_url}, m)
+	query := m.findRegistrations(bson.M{"message_name": message, "callback_url": callback_url})
+	registration := entities.Registration{}
+
+	err := query.One(&registration)
+	if err != nil {
+		log.Printf("Find Registration Error: %v\n", err)
+		return nil, err
+	}
+	return &registration, nil
+}
+
+func (m *MongoDal) GetRegistrationsByMessage(message string) ([]*entities.Registration, error) {
+	query := m.findRegistrations(bson.M{"message_name": message})
+	registrations := []*entities.Registration{}
+
+	err := query.All(&registrations)
+	if err != nil {
+		log.Printf("Find Registration Error: %v\n", err)
+		return nil, err
+	}
+	return registrations, nil
 }
 
 func (m *MongoDal) UpsertRegistration(registration *entities.Registration) error {
@@ -48,15 +69,25 @@ func (m *MongoDal) DeleteRegistration(registration *entities.Registration) error
 	return err
 }
 
-func findRegistration(bson interface{}, d *MongoDal) (*entities.Registration, error) {
-	session := d.mainSession.New()
-	c := session.DB(d.dataBaseName).C("registrations")
-	registration := entities.Registration{}
+func (m *MongoDal) UpsertEvent(event *entities.Event) error {
+	log.Printf("Create new Event: %v\n", event)
+	dbEvent := &entities.DBEvent{}
+	dbEvent.Id = bson.NewObjectId()
+	dbEvent.MessageName = event.MessageName
+	dbEvent.Callback = event.Callback
+	dbEvent.Payload = event.Payload
+	dbEvent.CreationDate = time.Now()
 
-	err := c.Find(bson).One(&registration)
-	if err != nil {
-		log.Printf("Find Registration Error: %v\n", err)
-		return nil, err
-	}
-	return &registration, nil
+	session := m.mainSession.New()
+	c := session.DB(m.dataBaseName).C("events")
+	err := c.Insert(dbEvent)
+
+	return err
+}
+
+func (m *MongoDal) findRegistrations(bson interface{}) *mgo.Query {
+	session := m.mainSession.New()
+	c := session.DB(m.dataBaseName).C("registrations")
+
+	return c.Find(bson)
 }

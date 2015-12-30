@@ -2,8 +2,8 @@ require 'pry'
 
 Before do |scenario|
   Registration.delete_all
-  clear_queue
-  clearMimicStubs
+  Event.delete_all
+  clear_queues
 end
 
 After do |scenario|
@@ -17,5 +17,6 @@ After do |scenario|
   end
 
   Registration.delete_all
-  clear_queue
+  Event.delete_all
+  clear_queues
 end

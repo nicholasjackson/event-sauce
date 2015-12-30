@@ -1,4 +1,4 @@
-@receive_event @implemented
+@receive_event
 Feature: Receive Event
 	In order to ensure quality
 	As a user
@@ -16,7 +16,8 @@ Scenario: Receive a valid event
 		"""
 	Then the response status should be "200"
 	And the JSON response should have "$..status_message" with the text "OK"
-  And 1 message should be registered on the queue
+	And I wait just a second
+  And 1 events should exist with message_name: "mytest.event"
 
 Scenario: Receive a event with no payload
 	Given I send a POST request to "/v1/event" with the following:

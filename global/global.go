@@ -22,7 +22,8 @@ type DataStore struct {
 
 type Queue struct {
 	ConnectionString string `json:"connection_string"`
-	MessageQueue     string `json:"message_queue"`
+	EventQueue       string `json:"event_queue"`
+	DeadLetterQueue  string `json:"dead_letter_queue"`
 }
 
 var Config ConfigStruct

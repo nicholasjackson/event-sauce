@@ -16,7 +16,7 @@ import (
 
 type EventTestDependencies struct {
 	StatsMock *mocks.MockStatsD `inject:"statsd"`
-	QueueMock *mocks.MockQueue  `inject:"queue"`
+	QueueMock *mocks.MockQueue  `inject:"eventqueue"`
 }
 
 var mockEventDeps *EventTestDependencies
@@ -32,7 +32,7 @@ func SetupEventTest(t *testing.T) {
 		&inject.Object{Value: EventHandlerDependencies},
 		&inject.Object{Value: mockEventDeps},
 		&inject.Object{Value: statsDMock, Name: "statsd"},
-		&inject.Object{Value: queueMock, Name: "queue"},
+		&inject.Object{Value: queueMock, Name: "eventqueue"},
 	)
 
 	mockEventDeps.StatsMock.Mock.On("Increment", mock.Anything).Return()
