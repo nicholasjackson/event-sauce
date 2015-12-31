@@ -41,7 +41,6 @@ func setupInjection() {
 		&inject.Object{Value: createStatsDClient(), Name: "statsd"},
 		&inject.Object{Value: createMongoClient(), Name: "dal"},
 		&inject.Object{Value: createEventQueueClient(), Name: "eventqueue"},
-		&inject.Object{Value: createDeadLetterQueueClient(), Name: "deadletterqueue"},
 		&inject.Object{Value: createEventDispatcher(), Name: "eventdispatcher"},
 		&inject.Object{Value: createEventQueueWorkerFactory(), Name: "eventqueueworkerfactory"},
 	)
@@ -70,14 +69,6 @@ func createMongoClient() *data.MongoDal {
 
 func createEventQueueClient() *queue.RedisQueue {
 	queue, err := queue.New(global.Config.Queue.ConnectionString, global.Config.Queue.EventQueue)
-	if err != nil {
-		panic(fmt.Sprintln("Unable to create Queue: ", err))
-	}
-	return queue
-}
-
-func createDeadLetterQueueClient() *queue.RedisQueue {
-	queue, err := queue.New(global.Config.Queue.ConnectionString, global.Config.Queue.DeadLetterQueue)
 	if err != nil {
 		panic(fmt.Sprintln("Unable to create Queue: ", err))
 	}

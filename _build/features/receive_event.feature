@@ -17,7 +17,7 @@ Scenario: Receive a valid event
 	Then the response status should be "200"
 	And the JSON response should have "$..status_event" with the text "OK"
 	And I wait just a second
-  And 1 events should exist with event_name: "mytest.event"
+  And 1 eventstoreitems should exist with event name "mytest.event"
 
 Scenario: Receive a event with no payload
 	Given I send a POST request to "/v1/event" with the following:
@@ -35,4 +35,5 @@ Scenario: Receive a event with no event_name
 		}
 	"""
 	Then the response status should be "400"
-  And 0 events should be registered on the queue
+	And I wait just a second
+  And 0 eventstoreitems should exist with event name "mytest.event"

@@ -2,20 +2,20 @@ package workers
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/nicholasjackson/event-sauce/data"
 	"github.com/nicholasjackson/event-sauce/entities"
-	"github.com/nicholasjackson/event-sauce/queue"
+	"github.com/nicholasjackson/event-sauce/global"
 )
 
 type EventQueueWorker struct {
 	eventDispatcher EventDispatcher
 	dal             data.Dal
-	deadLetterQueue queue.Queue
 }
 
-func New(eventDispatcher EventDispatcher, dal data.Dal, queue queue.Queue) *EventQueueWorker {
-	return &EventQueueWorker{eventDispatcher: eventDispatcher, dal: dal, deadLetterQueue: queue}
+func New(eventDispatcher EventDispatcher, dal data.Dal) *EventQueueWorker {
+	return &EventQueueWorker{eventDispatcher: eventDispatcher, dal: dal}
 }
 
 func (m *EventQueueWorker) HandleEvent(event *entities.Event) error {
@@ -56,10 +56,17 @@ func (m *EventQueueWorker) deleteRegistration(registration *entities.Registratio
 }
 
 func (m *EventQueueWorker) addToDeadLetterQueue(event *entities.Event, endpoint string) {
-	event.Callback = endpoint
-	m.deadLetterQueue.AddEvent(event)
+	deadLetter := entities.NewDeadLetterItem(*event)
+	duration, _ := time.ParseDuration(global.Config.RetryIntervals[0])
+
+	deadLetter.FailureCount = 1
+	deadLetter.FirstFailureDate = time.Now()
+	deadLetter.NextRetryDate = deadLetter.FirstFailureDate.Add(duration)
+
+	m.dal.UpsertDeadLetterItem(&deadLetter)
 }
 
 func (m *EventQueueWorker) saveEventToStore(event *entities.Event) error {
-	return m.dal.UpsertEvent(event)
+	eventStore := entities.NewEventStoreItem(*event)
+	return m.dal.UpsertEventStore(&eventStore)
 }

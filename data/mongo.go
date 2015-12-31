@@ -3,7 +3,6 @@ package data
 import (
 	"fmt"
 	"log"
-	"time"
 
 	"labix.org/v2/mgo"
 	"labix.org/v2/mgo/bson"
@@ -51,10 +50,10 @@ func (m *MongoDal) GetRegistrationsByEvent(event string) ([]*entities.Registrati
 
 func (m *MongoDal) UpsertRegistration(registration *entities.Registration) error {
 	log.Printf("Create new Registration: %v\n", registration)
-	registration.Id = bson.NewObjectId()
+
 	session := m.mainSession.New()
 	c := session.DB(m.dataBaseName).C("registrations")
-	err := c.Insert(registration)
+	_, err := c.UpsertId(registration.Id, registration)
 
 	return err
 }
@@ -69,18 +68,22 @@ func (m *MongoDal) DeleteRegistration(registration *entities.Registration) error
 	return err
 }
 
-func (m *MongoDal) UpsertEvent(event *entities.Event) error {
+func (m *MongoDal) UpsertEventStore(event *entities.EventStoreItem) error {
 	log.Printf("Create new Event: %v\n", event)
-	dbEvent := &entities.DBEvent{}
-	dbEvent.Id = bson.NewObjectId()
-	dbEvent.EventName = event.EventName
-	dbEvent.Callback = event.Callback
-	dbEvent.Payload = event.Payload
-	dbEvent.CreationDate = time.Now()
 
 	session := m.mainSession.New()
 	c := session.DB(m.dataBaseName).C("events")
-	err := c.Insert(dbEvent)
+	_, err := c.UpsertId(event.Id, event)
+
+	return err
+}
+
+func (m *MongoDal) UpsertDeadLetterItem(dead *entities.DeadLetterItem) error {
+	log.Printf("Create new Dead letter: %v\n", dead)
+
+	session := m.mainSession.New()
+	c := session.DB(m.dataBaseName).C("dead_letters")
+	_, err := c.UpsertId(dead.Id, dead)
 
 	return err
 }

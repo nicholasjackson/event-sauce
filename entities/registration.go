@@ -7,8 +7,10 @@ import (
 )
 
 type Registration struct {
-	Id           bson.ObjectId `bson:"_id"`
-	EventName  string        "event_name,omitempty"
-	CallbackUrl  string        "callback_url,omitempty"
-	CreationDate time.Time     "creation_date,omitempty"
+	Id            bson.ObjectId `bson:"_id"`
+	EventName     string        `bson:"event_name,omitempty"`
+	CallbackUrl   string        `bson:"callback_url,omitempty"`
+	CreationDate  time.Time     `bson:"creation_date,omitempty"`
+	FirstFailDate time.Time     `bson:"first_fail_date,omitempty"`
+	LastFailDate  time.Time     `bson:"last_fail_date,omitempty"`
 }

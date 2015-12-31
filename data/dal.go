@@ -8,5 +8,7 @@ type Dal interface {
 	UpsertRegistration(registration *entities.Registration) error
 	DeleteRegistration(registration *entities.Registration) error
 
-	UpsertEvent(event *entities.Event) error
+	UpsertEventStore(event *entities.EventStoreItem) error
+
+	UpsertDeadLetterItem(dead *entities.DeadLetterItem) error
 }

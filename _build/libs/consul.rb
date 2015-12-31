@@ -11,4 +11,6 @@ def setConsulVariables host, port
   kvs.put('/api/eventsauce/queue/connection_string','redis:6379')
   kvs.put('/api/eventsauce/queue/event_queue','event_queue')
   kvs.put('/api/eventsauce/queue/dead_letter_queue','dead_letter_queue')
+
+  kvs.put('/api/eventsauce/retry_intervals','["1s", "30s", "10m", "1h", "1d"]')
 end

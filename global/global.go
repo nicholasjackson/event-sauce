@@ -13,6 +13,7 @@ type ConfigStruct struct {
 	RootFolder     string    `json:"root_folder"`
 	Data           DataStore `json:"data_store"`
 	Queue          Queue     `json:"queue"`
+	RetryIntervals []string  `json:"retry_intervals"`
 }
 
 type DataStore struct {
@@ -23,7 +24,6 @@ type DataStore struct {
 type Queue struct {
 	ConnectionString string `json:"connection_string"`
 	EventQueue       string `json:"event_queue"`
-	DeadLetterQueue  string `json:"dead_letter_queue"`
 }
 
 var Config ConfigStruct

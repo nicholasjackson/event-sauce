@@ -19,7 +19,7 @@ Background:
 			]}
 		"""
 
-Scenario: Dispatch a event to a single healthy consumers, should result in one event being received and the event stored in the eventstore
+Scenario: Dispatch an event to a single healthy consumers, should result in one event being received and the event stored in the eventstore
 	Given I send a POST request to "/v1/register" with the following:
 		| event_name | mytest.event                              |
 		| callback_url | http://callbackserver:11988/v1/helloworld |
@@ -34,9 +34,9 @@ Scenario: Dispatch a event to a single healthy consumers, should result in one e
 			}
 		"""
 	Then I expect 1 callbacks to have been received with the correct payload
-	And 1 events should exist with event_name: "mytest.event"
+	And 1 eventstoreitems should exist with event name "mytest.event"
 
-Scenario: Dispatch a event to a multiple healthy consumers, should result in two events being received.
+Scenario: Dispatch an event to a multiple healthy consumers, should result in two events being received.
 	Given I send a POST request to "/v1/register" with the following:
 		| event_name | mytest.event                              |
 		| callback_url | http://callbackserver:11988/v1/helloworld |
@@ -55,7 +55,7 @@ Scenario: Dispatch a event to a multiple healthy consumers, should result in two
 		"""
 	Then I expect 2 callbacks to have been received with the correct payload
 
-Scenario: Dispatch a event to a one healthy one nonexistent consumers, should result in a event received by the healthy endpoint and the unhealthy endpoint being unregistered
+Scenario: Dispatch an event to a one healthy one nonexistent consumers, should result in a event received by the healthy endpoint and the unhealthy endpoint being unregistered
 	Given I send a POST request to "/v1/register" with the following:
 		| event_name | mytest.event                              |
 		| callback_url | http://callbackserver:11988/v1/helloworld |

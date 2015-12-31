@@ -8,16 +8,38 @@ import (
 
 // this needs separated into data entities and api entities
 type Event struct {
-	Id          string `json:"id"`
-	EventName string `json:"event_name"`
-	Payload     string `json:"payload"`
-	Callback    string `json:"callback"`
+	EventName string `json:"event_name" bson:"event_name"`
+	Payload   string `json:"payload" bson:"payload"`
 }
 
-type DBEvent struct {
+type EventStoreItem struct {
 	Id           bson.ObjectId `bson:"_id"`
-	EventName  string        "event_name,omitempty"
-	Payload      string        "payload,omitempty"
-	Callback     string        "callback,omitempty"
-	CreationDate time.Time     "creation_date,omitempty"
+	Event        Event         `bson:"event,omitempty"`
+	CreationDate time.Time     `bson:"creation_date,omitempty"`
+}
+
+type DeadLetterItem struct {
+	Id               bson.ObjectId `bson:"_id"`
+	Event            Event         `bson:"event,omitempty"`
+	CreationDate     time.Time     `bson:"creation_date,omitempty"`
+	FirstFailureDate time.Time     `bson:"first_failure_date,omitempty"`
+	NextRetryDate    time.Time     `bson:"next_retry_date,omitempty"`
+	FailureCount     int           `bson:"failure_count,omitempty"`
+	CallbackUrl      string        `bson:"callback_url,omitempty"`
+}
+
+func NewEventStoreItem(event Event) EventStoreItem {
+	return EventStoreItem{
+		Id:           bson.NewObjectId(),
+		Event:        event,
+		CreationDate: time.Now(),
+	}
+}
+
+func NewDeadLetterItem(event Event) DeadLetterItem {
+	return DeadLetterItem{
+		Id:           bson.NewObjectId(),
+		Event:        event,
+		CreationDate: time.Now(),
+	}
 }

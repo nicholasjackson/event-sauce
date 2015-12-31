@@ -17,14 +17,21 @@ func (m *MockStatsD) Increment(label string) {
 
 type MockDal struct {
 	mock.Mock
-	UpsertObject *entities.Registration
-	DeleteObject *entities.Registration
+	UpsertObject     *entities.Registration
+	DeleteObject     *entities.Registration
+	UpsertDeadLetter *entities.DeadLetterItem
 }
 
 func (m *MockDal) GetRegistrationsByEvent(event string) ([]*entities.Registration, error) {
 	args := m.Mock.Called(event)
 	if args.Get(0) != nil {
-		return args.Get(0).([]*entities.Registration), args.Error(1)
+		f, ok := args.Get(0).(func() []*entities.Registration)
+		if ok {
+			return f(), args.Error(1)
+		} else {
+			return args.Get(0).([]*entities.Registration), args.Error(1)
+		}
+
 	} else {
 		return nil, args.Error(1)
 	}
@@ -51,8 +58,15 @@ func (m *MockDal) DeleteRegistration(registration *entities.Registration) error 
 	return args.Error(0)
 }
 
-func (m *MockDal) UpsertEvent(event *entities.Event) error {
+func (m *MockDal) UpsertEventStore(event *entities.EventStoreItem) error {
 	args := m.Mock.Called(event)
+
+	return args.Error(0)
+}
+
+func (m *MockDal) UpsertDeadLetterItem(dead *entities.DeadLetterItem) error {
+	m.UpsertDeadLetter = dead
+	args := m.Mock.Called(dead)
 
 	return args.Error(0)
 }
