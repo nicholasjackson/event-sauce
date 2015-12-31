@@ -1,8 +1,8 @@
 require 'redis'
 
 # refactor this and mimic steps
-Then(/^(\d+) (?:message|messages) should be registered on the queue$/) do |count|
-  checkQueueLength 'rmq::queue::[message_queue]::ready', count
+Then(/^(\d+) (?:event|events) should be registered on the queue$/) do |count|
+  checkQueueLength 'rmq::queue::[event_queue]::ready', count
 end
 
 Then(/^I expect (\d+) event on the dead letter queue$/) do |count|
@@ -18,7 +18,7 @@ def checkQueueLength queue, count
 
     qlength = elements.length
 
-    raise "expected #{count} messages, received #{qlength}" unless timer < 5
+    raise "expected #{count} events, received #{qlength}" unless timer < 5
 
     if qlength != count.to_i
       timer = timer + 1

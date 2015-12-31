@@ -25,8 +25,8 @@ func New(connectionString string, dataBaseName string) (*MongoDal, error) {
 	return &MongoDal{mainSession: session, dataBaseName: dataBaseName}, nil
 }
 
-func (m *MongoDal) GetRegistrationByMessageAndCallback(message string, callback_url string) (*entities.Registration, error) {
-	query := m.findRegistrations(bson.M{"message_name": message, "callback_url": callback_url})
+func (m *MongoDal) GetRegistrationByEventAndCallback(event string, callback_url string) (*entities.Registration, error) {
+	query := m.findRegistrations(bson.M{"event_name": event, "callback_url": callback_url})
 	registration := entities.Registration{}
 
 	err := query.One(&registration)
@@ -37,8 +37,8 @@ func (m *MongoDal) GetRegistrationByMessageAndCallback(message string, callback_
 	return &registration, nil
 }
 
-func (m *MongoDal) GetRegistrationsByMessage(message string) ([]*entities.Registration, error) {
-	query := m.findRegistrations(bson.M{"message_name": message})
+func (m *MongoDal) GetRegistrationsByEvent(event string) ([]*entities.Registration, error) {
+	query := m.findRegistrations(bson.M{"event_name": event})
 	registrations := []*entities.Registration{}
 
 	err := query.All(&registrations)
@@ -73,7 +73,7 @@ func (m *MongoDal) UpsertEvent(event *entities.Event) error {
 	log.Printf("Create new Event: %v\n", event)
 	dbEvent := &entities.DBEvent{}
 	dbEvent.Id = bson.NewObjectId()
-	dbEvent.MessageName = event.MessageName
+	dbEvent.EventName = event.EventName
 	dbEvent.Callback = event.Callback
 	dbEvent.Payload = event.Payload
 	dbEvent.CreationDate = time.Now()

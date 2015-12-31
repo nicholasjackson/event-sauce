@@ -21,7 +21,7 @@ paths:
         - Health
       responses:
         '200':
-          description: Status message from server describing current health
+          description: Status event from server describing current health
           schema:
             type: object
             $ref: '#/definitions/Response'
@@ -74,7 +74,7 @@ paths:
     post:
       summary: Add a event to the queue
       description: |
-        The event endpoint allows messages to be added to the event store, when a message is received it will be queued for dispatch to any consumers.
+        The event endpoint allows events to be added to the event store, when a event is received it will be queued for dispatch to any consumers.
       tags:
         - Event
       parameters:
@@ -95,30 +95,30 @@ definitions:
   Response:
     type: object
     properties:
-      status_message:
+      status_event:
         type: string
         description: 'Plain text readable response'
   RegistrationRequest:
     type: object
     required:
-      - message_name
+      - event_name
       - callback_url
     properties:
-      message:
+      event:
         type: string
-        description: 'The name of the message to subscibe updates to'
+        description: 'The name of the event to subscibe updates to'
       callback_url:
         type: string
-        description: 'Callback Url that the server will POST the message to'
+        description: 'Callback Url that the server will POST the event to'
   EventRequest:
     type: object
     required:
-      - message_name
+      - event_name
       - payload
     properties:
-      message_name:
+      event_name:
         type: string
         description: 'The name of the event'
       payload:
         type: string
-        description: 'Payload for the message represented as a string'
+        description: 'Payload for the event represented as a string'

@@ -11,7 +11,7 @@ import (
 )
 
 type RegisterRequest struct {
-	MessageName string `json:"message_name"`
+	EventName   string `json:"event_name"`
 	CallbackUrl string `json:"callback_url"`
 }
 
@@ -34,15 +34,15 @@ func RegisterCreateHandler(rw http.ResponseWriter, r *http.Request) {
 	request := RegisterRequest{}
 
 	err := json.Unmarshal(data, &request)
-	if err != nil || request.MessageName == "" || request.CallbackUrl == "" {
+	if err != nil || request.EventName == "" || request.CallbackUrl == "" {
 		http.Error(rw, "Invalid request object", http.StatusBadRequest)
 		return
 	}
 
-	if r, _ := RegisterHandlerDependencies.Dal.GetRegistrationByMessageAndCallback(
-		request.MessageName, request.CallbackUrl); r == nil {
+	if r, _ := RegisterHandlerDependencies.Dal.GetRegistrationByEventAndCallback(
+		request.EventName, request.CallbackUrl); r == nil {
 		registration := &entities.Registration{}
-		registration.MessageName = request.MessageName
+		registration.EventName = request.EventName
 		registration.CallbackUrl = request.CallbackUrl
 		_ = RegisterHandlerDependencies.Dal.UpsertRegistration(registration)
 	} else {
@@ -50,7 +50,7 @@ func RegisterCreateHandler(rw http.ResponseWriter, r *http.Request) {
 	}
 
 	var response BaseResponse
-	response.StatusMessage = "OK"
+	response.StatusEvent = "OK"
 
 	encoder := json.NewEncoder(rw)
 	encoder.Encode(&response)
@@ -64,20 +64,20 @@ func RegisterDeleteHandler(rw http.ResponseWriter, r *http.Request) {
 	request := RegisterRequest{}
 
 	err := json.Unmarshal(data, &request)
-	if err != nil || request.MessageName == "" || request.CallbackUrl == "" {
+	if err != nil || request.EventName == "" || request.CallbackUrl == "" {
 		http.Error(rw, "Invalid request object", http.StatusBadRequest)
 		return
 	}
 
-	if r, _ := RegisterHandlerDependencies.Dal.GetRegistrationByMessageAndCallback(
-		request.MessageName, request.CallbackUrl); r != nil {
+	if r, _ := RegisterHandlerDependencies.Dal.GetRegistrationByEventAndCallback(
+		request.EventName, request.CallbackUrl); r != nil {
 		if err = RegisterHandlerDependencies.Dal.DeleteRegistration(r); err != nil {
 			http.Error(rw, "Unable to delete request object", http.StatusInternalServerError)
 			return
 		}
 
 		var response BaseResponse
-		response.StatusMessage = "OK"
+		response.StatusEvent = "OK"
 
 		encoder := json.NewEncoder(rw)
 		encoder.Encode(&response)

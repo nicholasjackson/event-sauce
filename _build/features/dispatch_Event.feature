@@ -19,35 +19,35 @@ Background:
 			]}
 		"""
 
-Scenario: Dispatch a message to a single healthy consumers, should result in one message being received and the event stored in the eventstore
+Scenario: Dispatch a event to a single healthy consumers, should result in one event being received and the event stored in the eventstore
 	Given I send a POST request to "/v1/register" with the following:
-		| message_name | mytest.event                              |
+		| event_name | mytest.event                              |
 		| callback_url | http://callbackserver:11988/v1/helloworld |
 	And the response status should be "200"
 	When I send a POST request to "/v1/event" with the following:
 		"""
 			{
-				"message_name": "mytest.event",
+				"event_name": "mytest.event",
 				"payload": {
 					"something": "something"
 				}
 			}
 		"""
 	Then I expect 1 callbacks to have been received with the correct payload
-	And 1 events should exist with message_name: "mytest.event"
+	And 1 events should exist with event_name: "mytest.event"
 
-Scenario: Dispatch a message to a multiple healthy consumers, should result in two messages being received.
+Scenario: Dispatch a event to a multiple healthy consumers, should result in two events being received.
 	Given I send a POST request to "/v1/register" with the following:
-		| message_name | mytest.event                              |
+		| event_name | mytest.event                              |
 		| callback_url | http://callbackserver:11988/v1/helloworld |
 	And I send a POST request to "/v1/register" with the following:
-		| message_name | mytest.event                                 |
+		| event_name | mytest.event                                 |
 		| callback_url | http://callbackserver:11988/v1/othercallback |
 	And the response status should be "200"
 	When I send a POST request to "/v1/event" with the following:
 		"""
 			{
-				"message_name": "mytest.event",
+				"event_name": "mytest.event",
 				"payload": {
 					"something": "something"
 				}
@@ -55,40 +55,40 @@ Scenario: Dispatch a message to a multiple healthy consumers, should result in t
 		"""
 	Then I expect 2 callbacks to have been received with the correct payload
 
-Scenario: Dispatch a message to a one healthy one nonexistent consumers, should result in a message received by the healthy endpoint and the unhealthy endpoint being unregistered
+Scenario: Dispatch a event to a one healthy one nonexistent consumers, should result in a event received by the healthy endpoint and the unhealthy endpoint being unregistered
 	Given I send a POST request to "/v1/register" with the following:
-		| message_name | mytest.event                              |
+		| event_name | mytest.event                              |
 		| callback_url | http://callbackserver:11988/v1/helloworld |
 	And I send a POST request to "/v1/register" with the following:
-		| message_name | mytest.event                                |
+		| event_name | mytest.event                                |
 		| callback_url | http://callbackserver:11988/v1/doesnotexist |
 	And the response status should be "200"
 	When I send a POST request to "/v1/event" with the following:
 		"""
 			{
-				"message_name": "mytest.event",
+				"event_name": "mytest.event",
 				"payload": {
 					"something": "something"
 				}
 			}
 		"""
 	Then I expect 1 callbacks to have been received with the correct payload
-	And 1 registrations should exist with message_name: "mytest.event", callback_url: "http://callbackserver:11988/v1/helloworld"
-	And 0 registrations should exist with message_name: "mytest.event", callback_url: "http://callbackserver:11988/v1/doesnotexist"
+	And 1 registrations should exist with event_name: "mytest.event", callback_url: "http://callbackserver:11988/v1/helloworld"
+	And 0 registrations should exist with event_name: "mytest.event", callback_url: "http://callbackserver:11988/v1/doesnotexist"
 
 Scenario: Dispatch an event to a one unhealthy consumers, should result in an event added to the dead letter queue
 	Given I send a POST request to "/v1/register" with the following:
-		| message_name | mytest.event                        |
+		| event_name | mytest.event                        |
 		| callback_url | http://callbackservers/v1/unhealthy |
 	And the response status should be "200"
 	When I send a POST request to "/v1/event" with the following:
 		"""
 			{
-				"message_name": "mytest.event",
+				"event_name": "mytest.event",
 				"payload": {
 					"something": "something"
 				}
 			}
 		"""
 	Then I expect 1 event on the dead letter queue
-	And 1 registrations should exist with message_name: "mytest.event", callback_url: "http://callbackservers/v1/unhealthy"
+	And 1 registrations should exist with event_name: "mytest.event", callback_url: "http://callbackservers/v1/unhealthy"

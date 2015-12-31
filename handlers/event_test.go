@@ -58,7 +58,7 @@ func TestEventWithNoPayloadReturns400(t *testing.T) {
 	var request http.Request
 	request.Body = ioutil.NopCloser(bytes.NewBufferString(`
     {
-      "message_name": "mymessage.stuff"
+      "event_name": "myevent.stuff"
     }`))
 
 	EventHandler(&responseRecorder, &request)
@@ -66,14 +66,14 @@ func TestEventWithNoPayloadReturns400(t *testing.T) {
 	assert.Equal(t, 400, responseRecorder.Code)
 }
 
-func TestEventWithNoMessageNameReturns400(t *testing.T) {
+func TestEventWithNoEventNameReturns400(t *testing.T) {
 	SetupEventTest(t)
 
 	var responseRecorder httptest.ResponseRecorder
 	var request http.Request
 	request.Body = ioutil.NopCloser(bytes.NewBufferString(`
     {
-      "payload": {"name": "mymessage.stuff"}
+      "payload": {"name": "myevent.stuff"}
     }`))
 
 	EventHandler(&responseRecorder, &request)
@@ -81,15 +81,15 @@ func TestEventWithNoMessageNameReturns400(t *testing.T) {
 	assert.Equal(t, 400, responseRecorder.Code)
 }
 
-func TestEventWithValidMessageReturns200(t *testing.T) {
+func TestEventWithValidEventReturns200(t *testing.T) {
 	SetupEventTest(t)
 
 	var responseRecorder httptest.ResponseRecorder
 	var request http.Request
 	request.Body = ioutil.NopCloser(bytes.NewBufferString(`
     {
-      "message_name": "mymessage.stuff",
-      "payload": {"name": "mymessage.stuff"}
+      "event_name": "myevent.stuff",
+      "payload": {"name": "myevent.stuff"}
     }`))
 
 	EventHandler(&responseRecorder, &request)
@@ -97,18 +97,18 @@ func TestEventWithValidMessageReturns200(t *testing.T) {
 	assert.Equal(t, 200, responseRecorder.Code)
 }
 
-func TestEventWithValidMessageAddsToQueue(t *testing.T) {
+func TestEventWithValidEventAddsToQueue(t *testing.T) {
 	SetupEventTest(t)
 
 	var responseRecorder httptest.ResponseRecorder
 	var request http.Request
 	request.Body = ioutil.NopCloser(bytes.NewBufferString(`
     {
-      "message_name": "mymessage.stuff",
-      "payload": {"name": "mymessage.stuff"}
+      "event_name": "myevent.stuff",
+      "payload": {"name": "myevent.stuff"}
     }`))
 
 	EventHandler(&responseRecorder, &request)
 
-	mockEventDeps.QueueMock.Mock.AssertCalled(t, "Add", "mymessage.stuff", `{"name": "mymessage.stuff"}`)
+	mockEventDeps.QueueMock.Mock.AssertCalled(t, "Add", "myevent.stuff", `{"name": "myevent.stuff"}`)
 }

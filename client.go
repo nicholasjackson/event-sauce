@@ -30,6 +30,6 @@ func startClient(wg *sync.WaitGroup) {
 
 	ClientDeps.EventQueue.StartConsuming(10, time.Second, func(event *entities.Event) {
 		worker := ClientDeps.WorkerFactory.Create()
-		worker.HandleMessage(event)
+		worker.HandleEvent(event)
 	})
 }

@@ -21,8 +21,8 @@ type MockDal struct {
 	DeleteObject *entities.Registration
 }
 
-func (m *MockDal) GetRegistrationsByMessage(message string) ([]*entities.Registration, error) {
-	args := m.Mock.Called(message)
+func (m *MockDal) GetRegistrationsByEvent(event string) ([]*entities.Registration, error) {
+	args := m.Mock.Called(event)
 	if args.Get(0) != nil {
 		return args.Get(0).([]*entities.Registration), args.Error(1)
 	} else {
@@ -30,8 +30,8 @@ func (m *MockDal) GetRegistrationsByMessage(message string) ([]*entities.Registr
 	}
 }
 
-func (m *MockDal) GetRegistrationByMessageAndCallback(message string, callback_url string) (*entities.Registration, error) {
-	args := m.Mock.Called(message, callback_url)
+func (m *MockDal) GetRegistrationByEventAndCallback(event string, callback_url string) (*entities.Registration, error) {
+	args := m.Mock.Called(event, callback_url)
 	if args.Get(0) != nil {
 		return args.Get(0).(*entities.Registration), args.Error(1)
 	} else {
@@ -62,8 +62,8 @@ type MockQueue struct {
 	ConsumerCallback func(event *entities.Event)
 }
 
-func (m *MockQueue) Add(message_name string, payload string) error {
-	args := m.Mock.Called(message_name, payload)
+func (m *MockQueue) Add(event_name string, payload string) error {
+	args := m.Mock.Called(event_name, payload)
 	return args.Error(0)
 }
 
@@ -81,7 +81,7 @@ type MockWorker struct {
 	mock.Mock
 }
 
-func (m *MockWorker) HandleMessage(event *entities.Event) error {
+func (m *MockWorker) HandleEvent(event *entities.Event) error {
 	args := m.Mock.Called(event)
 	return args.Error(0)
 }
@@ -90,7 +90,7 @@ type MockEventDispatcher struct {
 	mock.Mock
 }
 
-func (m *MockEventDispatcher) DispatchMessage(event *entities.Event, endpoint string) (int, error) {
+func (m *MockEventDispatcher) DispatchEvent(event *entities.Event, endpoint string) (int, error) {
 	args := m.Mock.Called(event, endpoint)
 	return args.Int(0), args.Error(1)
 }

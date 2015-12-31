@@ -8,24 +8,24 @@ Scenario: Receive a valid event
 	Given I send a POST request to "/v1/event" with the following:
 		"""
 			{
-				"message_name": "mytest.event",
+				"event_name": "mytest.event",
 				"payload": {
 					"something": "something"
 				}
 			}
 		"""
 	Then the response status should be "200"
-	And the JSON response should have "$..status_message" with the text "OK"
+	And the JSON response should have "$..status_event" with the text "OK"
 	And I wait just a second
-  And 1 events should exist with message_name: "mytest.event"
+  And 1 events should exist with event_name: "mytest.event"
 
 Scenario: Receive a event with no payload
 	Given I send a POST request to "/v1/event" with the following:
-		| message_name | mytest.event |
+		| event_name | mytest.event |
 	Then the response status should be "400"
-  And 0 messages should be registered on the queue
+  And 0 events should be registered on the queue
 
-Scenario: Receive a event with no message_name
+Scenario: Receive a event with no event_name
 	Given I send a POST request to "/v1/event" with the following:
 	"""
 		{
@@ -35,4 +35,4 @@ Scenario: Receive a event with no message_name
 		}
 	"""
 	Then the response status should be "400"
-  And 0 messages should be registered on the queue
+  And 0 events should be registered on the queue

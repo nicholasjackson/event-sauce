@@ -57,7 +57,7 @@ func SetupClientTest(t *testing.T) {
 	mockClientDeps.StatsMock.Mock.On("Increment", mock.Anything).Return()
 	mockClientDeps.EventQueueMock.Mock.On("StartConsuming", mock.Anything, mock.Anything, mock.Anything)
 	mockClientDeps.WorkerFactoryMock.Mock.On("Create").Return(mockWorker)
-	mockWorker.Mock.On("HandleMessage", mock.Anything, mock.Anything).Return(nil)
+	mockWorker.Mock.On("HandleEvent", mock.Anything, mock.Anything).Return(nil)
 	//mockRegisterDeps.DalMock.Mock.On("UpsertRegistration", mock.Anything).Return(nil, nil)
 	//mockRegisterDeps.DalMock.Mock.On("DeleteRegistration", mock.Anything).Return(nil, nil)
 }
@@ -91,5 +91,5 @@ func TestClientProcessesEventWhenItemDeQueued(t *testing.T) {
 
 	startClient(&testWaitGroup)
 	mockClientDeps.EventQueueMock.ConsumerCallback(&entities.Event{})
-	mockWorker.Mock.AssertCalled(t, "HandleMessage", mock.Anything)
+	mockWorker.Mock.AssertCalled(t, "HandleEvent", mock.Anything)
 }

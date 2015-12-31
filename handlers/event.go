@@ -10,8 +10,8 @@ import (
 )
 
 type EventRequest struct {
-	MessageName string          `json:"message_name"`
-	Payload     json.RawMessage `json:"payload"`
+	EventName string          `json:"event_name"`
+	Payload   json.RawMessage `json:"payload"`
 }
 
 type EventDependencies struct {
@@ -32,17 +32,17 @@ func EventHandler(rw http.ResponseWriter, r *http.Request) {
 	request := EventRequest{}
 
 	err := json.Unmarshal(data, &request)
-	if err != nil || request.MessageName == "" || len(request.Payload) < 1 {
+	if err != nil || request.EventName == "" || len(request.Payload) < 1 {
 		http.Error(rw, "Invalid request object", http.StatusBadRequest)
 		return
 	}
 
-	if err = EventHandlerDependencies.Queue.Add(request.MessageName, string(request.Payload)); err != nil {
+	if err = EventHandlerDependencies.Queue.Add(request.EventName, string(request.Payload)); err != nil {
 		http.Error(rw, "Error adding item to queue", http.StatusInternalServerError)
 		return
 	} else {
 		var response BaseResponse
-		response.StatusMessage = "OK"
+		response.StatusEvent = "OK"
 
 		encoder := json.NewEncoder(rw)
 		encoder.Encode(&response)

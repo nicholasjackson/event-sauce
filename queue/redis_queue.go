@@ -22,8 +22,8 @@ func New(connectionString string, queueName string) (*RedisQueue, error) {
 	return &RedisQueue{Queue: taskQueue, name: queueName}, nil
 }
 
-func (r *RedisQueue) Add(messageName string, payload string) error {
-	queuePayload := entities.Event{MessageName: messageName, Payload: payload}
+func (r *RedisQueue) Add(eventName string, payload string) error {
+	queuePayload := entities.Event{EventName: eventName, Payload: payload}
 
 	return r.AddEvent(&queuePayload)
 }
@@ -49,7 +49,7 @@ func (r *RedisQueue) StartConsuming(size int, pollInterval time.Duration, callba
 
 // Interface from rmq
 func (r *RedisQueue) Consume(delivery rmq.Delivery) {
-	fmt.Println("Message Delivered:", delivery.Payload())
+	fmt.Println("Event Delivered:", delivery.Payload())
 
 	event := entities.Event{}
 

@@ -65,7 +65,7 @@ func TestRegisterCreateWithNoPayloadReturnsBadRequest(t *testing.T) {
 	assert.Equal(t, 400, responseRecorder.Code)
 }
 
-func TestRegisterCreateWithNoMessageNameReturnsBadRequest(t *testing.T) {
+func TestRegisterCreateWithNoEventNameReturnsBadRequest(t *testing.T) {
 	SetupRegisterTest(t)
 
 	var responseRecorder httptest.ResponseRecorder
@@ -87,7 +87,7 @@ func TestRegisterCreateWithNoCallbackUrlReturnsBadRequest(t *testing.T) {
 	var request http.Request
 	request.Body = ioutil.NopCloser(bytes.NewBufferString(`
 		{
-			"message_name": "dfdffd"
+			"event_name": "dfdffd"
 		}`))
 
 	RegisterCreateHandler(&responseRecorder, &request)
@@ -97,13 +97,13 @@ func TestRegisterCreateWithNoCallbackUrlReturnsBadRequest(t *testing.T) {
 
 func TestRegisterCreateWithValidRequestSavesDataWhenRegistrationDoesNotExist(t *testing.T) {
 	SetupRegisterTest(t)
-	mockRegisterDeps.DalMock.Mock.On("GetRegistrationByMessageAndCallback", "event.something", "http://some_callback_url.com").Return(nil, nil)
+	mockRegisterDeps.DalMock.Mock.On("GetRegistrationByEventAndCallback", "event.something", "http://some_callback_url.com").Return(nil, nil)
 
 	var responseRecorder httptest.ResponseRecorder
 	var request http.Request
 	request.Body = ioutil.NopCloser(bytes.NewBufferString(`
 		{
-			"message_name": "event.something",
+			"event_name": "event.something",
 			"callback_url": "http://some_callback_url.com"
 		}`))
 
@@ -115,32 +115,32 @@ func TestRegisterCreateWithValidRequestSavesDataWhenRegistrationDoesNotExist(t *
 
 func TestRegisterCreateWithValidRequestCreatesValidRegistration(t *testing.T) {
 	SetupRegisterTest(t)
-	mockRegisterDeps.DalMock.Mock.On("GetRegistrationByMessageAndCallback", "event.something", "http://some_callback_url.com").Return(nil, nil)
+	mockRegisterDeps.DalMock.Mock.On("GetRegistrationByEventAndCallback", "event.something", "http://some_callback_url.com").Return(nil, nil)
 
 	var responseRecorder httptest.ResponseRecorder
 	var request http.Request
 	request.Body = ioutil.NopCloser(bytes.NewBufferString(`
 		{
-			"message_name": "event.something",
+			"event_name": "event.something",
 			"callback_url": "http://some_callback_url.com"
 		}`))
 
 	RegisterCreateHandler(&responseRecorder, &request)
 
 	registration := mockRegisterDeps.DalMock.UpsertObject
-	assert.Equal(t, "event.something", registration.MessageName)
+	assert.Equal(t, "event.something", registration.EventName)
 	assert.Equal(t, "http://some_callback_url.com", registration.CallbackUrl)
 }
 
 func TestRegisterCreateWithValidRequestDoesNotSaveDataWhenRegistrationExists(t *testing.T) {
 	SetupRegisterTest(t)
-	mockRegisterDeps.DalMock.Mock.On("GetRegistrationByMessageAndCallback", "event.something", "http://some_callback_url.com").Return(&entities.Registration{}, nil)
+	mockRegisterDeps.DalMock.Mock.On("GetRegistrationByEventAndCallback", "event.something", "http://some_callback_url.com").Return(&entities.Registration{}, nil)
 
 	var responseRecorder httptest.ResponseRecorder
 	var request http.Request
 	request.Body = ioutil.NopCloser(bytes.NewBufferString(`
 		{
-			"message_name": "event.something",
+			"event_name": "event.something",
 			"callback_url": "http://some_callback_url.com"
 		}`))
 
@@ -174,7 +174,7 @@ func TestRegisterDeleteWithNoPayloadReturnsBadRequest(t *testing.T) {
 	assert.Equal(t, 400, responseRecorder.Code)
 }
 
-func TestRegisterDeleteWithNoMessageNameReturnsBadRequest(t *testing.T) {
+func TestRegisterDeleteWithNoEventNameReturnsBadRequest(t *testing.T) {
 	SetupRegisterTest(t)
 
 	var responseRecorder httptest.ResponseRecorder
@@ -196,7 +196,7 @@ func TestRegisterDeleteWithNoCallbackUrlReturnsBadRequest(t *testing.T) {
 	var request http.Request
 	request.Body = ioutil.NopCloser(bytes.NewBufferString(`
 		{
-			"message_name": "dfdffd"
+			"event_name": "dfdffd"
 		}`))
 
 	RegisterDeleteHandler(&responseRecorder, &request)
@@ -207,7 +207,7 @@ func TestRegisterDeleteWithNoCallbackUrlReturnsBadRequest(t *testing.T) {
 func TestRegisterDeleteWithValidRequestReturns404WhenRegistrationDoesNotExist(t *testing.T) {
 	SetupRegisterTest(t)
 	mockRegisterDeps.DalMock.Mock.On(
-		"GetRegistrationByMessageAndCallback",
+		"GetRegistrationByEventAndCallback",
 		"event.something",
 		"http://some_callback_url.com").Return(nil, nil)
 
@@ -215,7 +215,7 @@ func TestRegisterDeleteWithValidRequestReturns404WhenRegistrationDoesNotExist(t 
 	var request http.Request
 	request.Body = ioutil.NopCloser(bytes.NewBufferString(`
 		{
-			"message_name": "event.something",
+			"event_name": "event.something",
 			"callback_url": "http://some_callback_url.com"
 		}`))
 
@@ -229,7 +229,7 @@ func TestRegisterDeleteWithValidRequestDeletesRegistration(t *testing.T) {
 	SetupRegisterTest(t)
 	registration := &entities.Registration{}
 	mockRegisterDeps.DalMock.Mock.On(
-		"GetRegistrationByMessageAndCallback",
+		"GetRegistrationByEventAndCallback",
 		"event.something",
 		"http://some_callback_url.com").Return(registration, nil)
 
@@ -237,7 +237,7 @@ func TestRegisterDeleteWithValidRequestDeletesRegistration(t *testing.T) {
 	var request http.Request
 	request.Body = ioutil.NopCloser(bytes.NewBufferString(`
 		{
-			"message_name": "event.something",
+			"event_name": "event.something",
 			"callback_url": "http://some_callback_url.com"
 		}`))
 

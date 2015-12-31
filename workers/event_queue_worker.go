@@ -18,10 +18,10 @@ func New(eventDispatcher EventDispatcher, dal data.Dal, queue queue.Queue) *Even
 	return &EventQueueWorker{eventDispatcher: eventDispatcher, dal: dal, deadLetterQueue: queue}
 }
 
-func (m *EventQueueWorker) HandleMessage(event *entities.Event) error {
+func (m *EventQueueWorker) HandleEvent(event *entities.Event) error {
 	_ = m.saveEventToStore(event)
 
-	registrations, _ := m.dal.GetRegistrationsByMessage(event.MessageName)
+	registrations, _ := m.dal.GetRegistrationsByEvent(event.EventName)
 
 	for _, registration := range registrations {
 		m.processEvent(event, registration)
@@ -33,7 +33,7 @@ func (m *EventQueueWorker) HandleMessage(event *entities.Event) error {
 func (m *EventQueueWorker) processEvent(event *entities.Event, registration *entities.Registration) {
 	fmt.Println("Processing Event:", event)
 
-	code, _ := m.eventDispatcher.DispatchMessage(event, registration.CallbackUrl)
+	code, _ := m.eventDispatcher.DispatchEvent(event, registration.CallbackUrl)
 
 	fmt.Println("processEvent: Finshed: ", code)
 	switch code {

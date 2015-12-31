@@ -21,14 +21,14 @@ func setupTests(t *testing.T) {
 	mockQueue = &mocks.MockQueue{}
 	worker = New(mockDispatcher, mockDal, mockQueue)
 
-	mockDispatcher.Mock.On("DispatchMessage", mock.Anything, mock.Anything).Return(200, nil)
-	mockDal.Mock.On("GetRegistrationsByMessage", mock.Anything).Return(nil, nil)
+	mockDispatcher.Mock.On("DispatchEvent", mock.Anything, mock.Anything).Return(200, nil)
+	mockDal.Mock.On("GetRegistrationsByEvent", mock.Anything).Return(nil, nil)
 	mockDal.Mock.On("DeleteRegistration", mock.Anything).Return(nil)
 	mockDal.Mock.On("UpsertEvent", mock.Anything).Return(nil)
 	mockQueue.Mock.On("AddEvent", mock.Anything).Return(nil)
 }
 
-func TestSetsMessageDispatcherAndDal(t *testing.T) {
+func TestSetsEventDispatcherAndDal(t *testing.T) {
 	setupTests(t)
 
 	assert.Equal(t, mockDispatcher, worker.eventDispatcher)
@@ -36,111 +36,111 @@ func TestSetsMessageDispatcherAndDal(t *testing.T) {
 	assert.Equal(t, mockQueue, worker.deadLetterQueue)
 }
 
-func TestHandleMessageSavesToMessageStore(t *testing.T) {
+func TestHandleEventSavesToEventStore(t *testing.T) {
 	setupTests(t)
-	message := &entities.Event{}
+	event := &entities.Event{}
 
-	worker.HandleMessage(message)
+	worker.HandleEvent(event)
 
-	mockDal.Mock.AssertCalled(t, "UpsertEvent", message)
+	mockDal.Mock.AssertCalled(t, "UpsertEvent", event)
 }
 
-func TestHandleMessageAttemptsToDispatchMessage(t *testing.T) {
+func TestHandleEventAttemptsToDispatchEvent(t *testing.T) {
 	setupTests(t)
-	message := &entities.Event{}
+	event := &entities.Event{}
 	endpoint := "myendpoint"
 	registrations := []*entities.Registration{&entities.Registration{CallbackUrl: endpoint}}
 	mockDal.Mock.ExpectedCalls = []*mock.Call{} // reset calls
-	mockDal.Mock.On("GetRegistrationsByMessage", mock.Anything).Return(registrations, nil)
+	mockDal.Mock.On("GetRegistrationsByEvent", mock.Anything).Return(registrations, nil)
 	mockDal.Mock.On("DeleteRegistration", mock.Anything).Return(nil)
 	mockDal.Mock.On("UpsertEvent", mock.Anything).Return(nil)
 
-	worker.HandleMessage(message)
+	worker.HandleEvent(event)
 
-	mockDispatcher.Mock.AssertCalled(t, "DispatchMessage", message, endpoint)
+	mockDispatcher.Mock.AssertCalled(t, "DispatchEvent", event, endpoint)
 }
 
-func TestHandleMessageAttemptsToDispatchMultipleMessage(t *testing.T) {
+func TestHandleEventAttemptsToDispatchMultipleEvent(t *testing.T) {
 	setupTests(t)
-	message := &entities.Event{}
+	event := &entities.Event{}
 	endpoint := "myendpoint"
 	registrations := []*entities.Registration{
 		&entities.Registration{CallbackUrl: endpoint},
 		&entities.Registration{CallbackUrl: endpoint},
 		&entities.Registration{CallbackUrl: endpoint}}
 	mockDal.Mock.ExpectedCalls = []*mock.Call{} // reset calls
-	mockDal.Mock.On("GetRegistrationsByMessage", mock.Anything).Return(registrations, nil)
+	mockDal.Mock.On("GetRegistrationsByEvent", mock.Anything).Return(registrations, nil)
 	mockDal.Mock.On("DeleteRegistration", mock.Anything).Return(nil)
 	mockDal.Mock.On("UpsertEvent", mock.Anything).Return(nil)
 
-	worker.HandleMessage(message)
+	worker.HandleEvent(event)
 
-	mockDispatcher.Mock.AssertNumberOfCalls(t, "DispatchMessage", 3)
+	mockDispatcher.Mock.AssertNumberOfCalls(t, "DispatchEvent", 3)
 }
 
-func TestHandleMessageGetsRegisterdEndpointsFromDB(t *testing.T) {
+func TestHandleEventGetsRegisterdEndpointsFromDB(t *testing.T) {
 	setupTests(t)
-	message := &entities.Event{MessageName: "mymessage"}
+	event := &entities.Event{EventName: "myevent"}
 
-	worker.HandleMessage(message)
+	worker.HandleEvent(event)
 
-	mockDal.Mock.AssertCalled(t, "GetRegistrationsByMessage", "mymessage")
+	mockDal.Mock.AssertCalled(t, "GetRegistrationsByEvent", "myevent")
 }
 
-func TestDispatchMessageFailureRemovesRegistrationWhenRegistrationFoundAndEndpointDoesNotExist(t *testing.T) {
+func TestDispatchEventFailureRemovesRegistrationWhenRegistrationFoundAndEndpointDoesNotExist(t *testing.T) {
 	setupTests(t)
-	message := &entities.Event{}
+	event := &entities.Event{}
 	endpoint := "myendpoint"
 	registrations := []*entities.Registration{&entities.Registration{CallbackUrl: endpoint}}
 
 	mockDispatcher.Mock.ExpectedCalls = []*mock.Call{} // reset calls
-	mockDispatcher.Mock.On("DispatchMessage", message, endpoint).Return(404, fmt.Errorf("Unable to complete"))
+	mockDispatcher.Mock.On("DispatchEvent", event, endpoint).Return(404, fmt.Errorf("Unable to complete"))
 
 	mockDal.Mock.ExpectedCalls = []*mock.Call{} // reset calls
-	mockDal.Mock.On("GetRegistrationsByMessage", mock.Anything).Return(registrations, nil)
+	mockDal.Mock.On("GetRegistrationsByEvent", mock.Anything).Return(registrations, nil)
 	mockDal.Mock.On("DeleteRegistration", mock.Anything).Return(nil)
 	mockDal.Mock.On("UpsertEvent", mock.Anything).Return(nil)
 
-	_ = worker.HandleMessage(message)
+	_ = worker.HandleEvent(event)
 
 	mockDal.Mock.AssertCalled(t, "DeleteRegistration", registrations[0])
 }
 
-func TestDispatchMessageFailureAddsMessageToDeadLetterQueueWhenEndpointInErrorState(t *testing.T) {
+func TestDispatchEventFailureAddsEventToDeadLetterQueueWhenEndpointInErrorState(t *testing.T) {
 	setupTests(t)
-	message := &entities.Event{}
+	event := &entities.Event{}
 	endpoint := "myendpoint"
 	registrations := []*entities.Registration{&entities.Registration{CallbackUrl: endpoint}}
 
 	mockDispatcher.Mock.ExpectedCalls = []*mock.Call{} // reset calls
-	mockDispatcher.Mock.On("DispatchMessage", message, endpoint).Return(500, fmt.Errorf("Unable to complete"))
+	mockDispatcher.Mock.On("DispatchEvent", event, endpoint).Return(500, fmt.Errorf("Unable to complete"))
 
 	mockDal.Mock.ExpectedCalls = []*mock.Call{} // reset calls
-	mockDal.Mock.On("GetRegistrationsByMessage", mock.Anything).Return(registrations, nil)
+	mockDal.Mock.On("GetRegistrationsByEvent", mock.Anything).Return(registrations, nil)
 	mockDal.Mock.On("DeleteRegistration", mock.Anything).Return(nil)
 	mockDal.Mock.On("UpsertEvent", mock.Anything).Return(nil)
 
-	_ = worker.HandleMessage(message)
+	_ = worker.HandleEvent(event)
 
-	assert.Equal(t, endpoint, message.Callback)
-	mockQueue.Mock.AssertCalled(t, "AddEvent", message)
+	assert.Equal(t, endpoint, event.Callback)
+	mockQueue.Mock.AssertCalled(t, "AddEvent", event)
 }
 
-func TestDispatchMessageOKDoesNothing(t *testing.T) {
+func TestDispatchEventOKDoesNothing(t *testing.T) {
 	setupTests(t)
-	message := &entities.Event{}
+	event := &entities.Event{}
 	endpoint := "myendpoint"
 	registrations := []*entities.Registration{&entities.Registration{CallbackUrl: endpoint}}
 
 	mockDispatcher.Mock.ExpectedCalls = []*mock.Call{} // reset calls
-	mockDispatcher.Mock.On("DispatchMessage", message, endpoint).Return(200, fmt.Errorf("Unable to complete"))
+	mockDispatcher.Mock.On("DispatchEvent", event, endpoint).Return(200, fmt.Errorf("Unable to complete"))
 
 	mockDal.Mock.ExpectedCalls = []*mock.Call{} // reset calls
-	mockDal.Mock.On("GetRegistrationsByMessage", mock.Anything).Return(registrations, nil)
+	mockDal.Mock.On("GetRegistrationsByEvent", mock.Anything).Return(registrations, nil)
 	mockDal.Mock.On("DeleteRegistration", mock.Anything).Return(nil)
 	mockDal.Mock.On("UpsertEvent", mock.Anything).Return(nil)
 
-	_ = worker.HandleMessage(message)
+	_ = worker.HandleEvent(event)
 
 	mockDal.Mock.AssertNumberOfCalls(t, "DeleteRegistration", 0)
 	mockQueue.Mock.AssertNumberOfCalls(t, "AddEvent", 0)

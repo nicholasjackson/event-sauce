@@ -21,7 +21,7 @@ func HealthHandler(rw http.ResponseWriter, r *http.Request) {
 	HealthHandlerDependencies.Stats.Increment(HEALTH_HANDLER_CALLED)
 
 	var response BaseResponse
-	response.StatusMessage = "OK"
+	response.StatusEvent = "OK"
 
 	encoder := json.NewEncoder(rw)
 	encoder.Encode(&response)

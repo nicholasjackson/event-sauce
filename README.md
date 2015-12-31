@@ -16,7 +16,7 @@ The workers publish the events, to the subscribers
 API:
 HEADERS: X-API-Key: asdfasdasdasd33434
 
-## publish is the public interface which the clients use to distribute a message through the system
+## publish is the public interface which the clients use to distribute a event through the system
 ```
 /publish/{event-name}
 {
@@ -86,7 +86,7 @@ attempts to match a value on an data object using dot notation e.g. given the be
   ]
 }
 ```
-name.firstname=nic% would match this message
+name.firstname=nic% would match this event
 ```
 = equality matcher
 != inequality matcher

@@ -7,7 +7,7 @@ import (
 )
 
 type Queue interface {
-	Add(message_name string, payload string) error
+	Add(event_name string, payload string) error
 	AddEvent(event *entities.Event) error
 	StartConsuming(size int, poll_interval time.Duration, callback func(event *entities.Event))
 }

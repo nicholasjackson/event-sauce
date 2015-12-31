@@ -8,7 +8,7 @@ import (
 
 type Registration struct {
 	Id           bson.ObjectId `bson:"_id"`
-	MessageName  string        "message_name,omitempty"
+	EventName  string        "event_name,omitempty"
 	CallbackUrl  string        "callback_url,omitempty"
 	CreationDate time.Time     "creation_date,omitempty"
 }
