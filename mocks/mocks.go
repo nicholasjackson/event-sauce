@@ -71,9 +71,25 @@ func (m *MockDal) UpsertDeadLetterItem(dead *entities.DeadLetterItem) error {
 	return args.Error(0)
 }
 
+func (m *MockDal) GetDeadLetterItemsReadyForRetry() ([]*entities.DeadLetterItem, error) {
+	args := m.Mock.Called()
+
+	if args.Get(0) != nil {
+		f, ok := args.Get(0).(func() []*entities.DeadLetterItem)
+		if ok {
+			return f(), args.Error(1)
+		} else {
+			return args.Get(0).([]*entities.DeadLetterItem), args.Error(1)
+		}
+
+	} else {
+		return nil, args.Error(1)
+	}
+}
+
 type MockQueue struct {
 	mock.Mock
-	ConsumerCallback func(event *entities.Event)
+	ConsumerCallback func(callbackItem interface{})
 }
 
 func (m *MockQueue) Add(event_name string, payload string) error {
@@ -86,7 +102,7 @@ func (m *MockQueue) AddEvent(event *entities.Event) error {
 	return args.Error(0)
 }
 
-func (m *MockQueue) StartConsuming(size int, poll_interval time.Duration, callback func(event *entities.Event)) {
+func (m *MockQueue) StartConsuming(size int, poll_interval time.Duration, callback func(callbackItem interface{})) {
 	m.ConsumerCallback = callback
 	_ = m.Mock.Called(size, poll_interval, callback)
 }
@@ -95,8 +111,8 @@ type MockWorker struct {
 	mock.Mock
 }
 
-func (m *MockWorker) HandleEvent(event *entities.Event) error {
-	args := m.Mock.Called(event)
+func (m *MockWorker) HandleItem(item interface{}) error {
+	args := m.Mock.Called(item)
 	return args.Error(0)
 }
 

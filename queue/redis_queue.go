@@ -12,7 +12,7 @@ import (
 type RedisQueue struct {
 	Queue    rmq.Queue
 	name     string
-	callback func(event *entities.Event)
+	callback func(callbackItem interface{})
 }
 
 func New(connectionString string, queueName string) (*RedisQueue, error) {
@@ -40,7 +40,7 @@ func (r *RedisQueue) AddEvent(event *entities.Event) error {
 	return nil
 }
 
-func (r *RedisQueue) StartConsuming(size int, pollInterval time.Duration, callback func(event *entities.Event)) {
+func (r *RedisQueue) StartConsuming(size int, pollInterval time.Duration, callback func(callbackItem interface{})) {
 	fmt.Println("StartConsuming")
 	r.callback = callback
 	r.Queue.StartConsuming(size, pollInterval)

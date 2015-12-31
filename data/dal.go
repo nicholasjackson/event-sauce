@@ -11,4 +11,5 @@ type Dal interface {
 	UpsertEventStore(event *entities.EventStoreItem) error
 
 	UpsertDeadLetterItem(dead *entities.DeadLetterItem) error
+	GetDeadLetterItemsReadyForRetry() ([]*entities.DeadLetterItem, error)
 }

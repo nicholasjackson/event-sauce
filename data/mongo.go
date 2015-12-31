@@ -3,6 +3,7 @@ package data
 import (
 	"fmt"
 	"log"
+	"time"
 
 	"labix.org/v2/mgo"
 	"labix.org/v2/mgo/bson"
@@ -86,6 +87,24 @@ func (m *MongoDal) UpsertDeadLetterItem(dead *entities.DeadLetterItem) error {
 	_, err := c.UpsertId(dead.Id, dead)
 
 	return err
+}
+
+func (m *MongoDal) GetDeadLetterItemsReadyForRetry() ([]*entities.DeadLetterItem, error) {
+	deadletters := []*entities.DeadLetterItem{}
+	session := m.mainSession.New()
+	c := session.DB(m.dataBaseName).C("dead_letters")
+	currentTime := time.Now()
+	err := c.Find(bson.M{
+		"next_retry_date": bson.M{
+			"$lte": currentTime,
+		},
+	}).All(deadletters)
+
+	if err != nil {
+		log.Printf("Find Registration Error: %v\n", err)
+		return nil, err
+	}
+	return deadletters, nil
 }
 
 func (m *MongoDal) findRegistrations(bson interface{}) *mgo.Query {

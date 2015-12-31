@@ -3,7 +3,7 @@ package workers
 import "github.com/nicholasjackson/event-sauce/entities"
 
 type Worker interface {
-	HandleEvent(event *entities.Event) error
+	HandleItem(item interface{}) error
 }
 
 type WorkerFactory interface {
