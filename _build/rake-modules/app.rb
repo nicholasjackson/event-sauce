@@ -114,7 +114,7 @@ namespace :app do
   		# remove stop running application
   		puts `docker-compose -f ./dockercompose/#{DOCKER_IMAGE_NAME}/docker-compose.yml stop`
   		# remove stopped containers
-  		puts `echo y | docker-compose -f ./dockercompose/#{DOCKER_IMAGE_NAME}/docker-compose.yml rm`
+  		puts `echo y | docker-compose -f ./dockercompose/#{DOCKER_IMAGE_NAME}/docker-compose.yml rm -v`
       abort "Cucumber steps failed" unless status == 0
   	end
   end

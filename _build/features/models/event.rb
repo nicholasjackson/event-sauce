@@ -2,6 +2,8 @@ class Event
   include Mongoid::Document
   field :event_name, type: String
   field :payload,    type: String
+
+  embedded_in :deadletteritem
 end
 
 class EventStoreItem
@@ -24,12 +26,13 @@ class DeadLetterItem
   field :next_retry_date,    type: DateTime
   field :failure_count,      type: Integer
   field :callback_url,       type: String
+
+  embeds_one :event
 end
 
 FactoryGirl.define do
   factory :event, class: Event do
     event_name "users.new_email"
-    callback_url "http://myserver.com/v1/newemail"
   end
 
   factory :eventstoreitem, class: EventStoreItem do
@@ -38,6 +41,10 @@ FactoryGirl.define do
   end
 
   factory :deadletteritem, class: DeadLetterItem do
-    event
+    association :event, factory: :event, strategy: :build
+    failure_count 1
+    callback_url "http://myserver.com/v1/newemail"
+    first_failure_date Time.now
   end
+
 end
