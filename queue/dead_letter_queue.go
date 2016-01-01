@@ -36,7 +36,11 @@ func (d *DeadLetterQueue) StartConsuming(size int, poll_interval time.Duration, 
 
 func (d *DeadLetterQueue) runConsumer(size int, callback func(callbackItem interface{})) {
 	deadLetters, _ := d.Dal.GetDeadLetterItemsReadyForRetry()
-	buffer := make(chan struct{}, size)
+	// remove the retrieved items from the queue to ensure that no other worker picks them up when processing
+	// the worker will re-add to the queue in the event of failure
+	_ = d.Dal.DeleteDeadLetterItems(deadLetters)
+
+	buffer := make(chan struct{}, size) // make channel same size as consumer size
 
 	for i, letter := range deadLetters {
 		buffer <- struct{}{} // add to the channel

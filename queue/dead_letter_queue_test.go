@@ -29,6 +29,7 @@ func SetupDeadTests(t *testing.T) {
 	global.Config.RetryIntervals = []string{duration}
 	mockDal.Mock.On("UpsertDeadLetterItem", mock.Anything).Return(nil)
 	mockDal.Mock.On("GetDeadLetterItemsReadyForRetry").Return(getLetters, nil)
+	mockDal.Mock.On("DeleteDeadLetterItems", mock.Anything).Return(nil)
 }
 
 func TestAddEventCreatesAValidDeadLetter(t *testing.T) {
@@ -52,6 +53,19 @@ func TestStartConsumingGetsDeadLetters(t *testing.T) {
 	queue.runConsumer(1, func(item interface{}) {})
 
 	mockDal.Mock.AssertCalled(t, "GetDeadLetterItemsReadyForRetry", mock.Anything)
+}
+
+func TestStartConsumingDeletesRetrievesDeadLettersFromQueue(t *testing.T) {
+	SetupDeadTests(t)
+	deadLetters = []*entities.DeadLetterItem{
+		&entities.DeadLetterItem{},
+		&entities.DeadLetterItem{},
+		&entities.DeadLetterItem{},
+	}
+
+	queue.runConsumer(1, func(item interface{}) {})
+
+	mockDal.Mock.AssertCalled(t, "DeleteDeadLetterItems", deadLetters)
 }
 
 func TestStartConsumingCallsCallbackForEachDeadLetter(t *testing.T) {

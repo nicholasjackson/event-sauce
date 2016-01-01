@@ -107,6 +107,17 @@ func (m *MongoDal) GetDeadLetterItemsReadyForRetry() ([]*entities.DeadLetterItem
 	return deadletters, nil
 }
 
+func (m *MongoDal) DeleteDeadLetterItems(dead []*entities.DeadLetterItem) error {
+	session := m.mainSession.New()
+	c := session.DB(m.dataBaseName).C("dead_letters")
+
+	for _, letter := range dead {
+		_ = c.RemoveId(letter.Id)
+	}
+
+	return nil
+}
+
 func (m *MongoDal) findRegistrations(bson interface{}) *mgo.Query {
 	session := m.mainSession.New()
 	c := session.DB(m.dataBaseName).C("registrations")

@@ -12,4 +12,5 @@ type Dal interface {
 
 	UpsertDeadLetterItem(dead *entities.DeadLetterItem) error
 	GetDeadLetterItemsReadyForRetry() ([]*entities.DeadLetterItem, error)
+	DeleteDeadLetterItems(dead []*entities.DeadLetterItem) error
 }

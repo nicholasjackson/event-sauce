@@ -31,7 +31,6 @@ func (m *MockDal) GetRegistrationsByEvent(event string) ([]*entities.Registratio
 		} else {
 			return args.Get(0).([]*entities.Registration), args.Error(1)
 		}
-
 	} else {
 		return nil, args.Error(1)
 	}
@@ -40,7 +39,12 @@ func (m *MockDal) GetRegistrationsByEvent(event string) ([]*entities.Registratio
 func (m *MockDal) GetRegistrationByEventAndCallback(event string, callback_url string) (*entities.Registration, error) {
 	args := m.Mock.Called(event, callback_url)
 	if args.Get(0) != nil {
-		return args.Get(0).(*entities.Registration), args.Error(1)
+		f, ok := args.Get(0).(func() *entities.Registration)
+		if ok {
+			return f(), args.Error(1)
+		} else {
+			return args.Get(0).(*entities.Registration), args.Error(1)
+		}
 	} else {
 		return nil, args.Error(1)
 	}
@@ -85,6 +89,12 @@ func (m *MockDal) GetDeadLetterItemsReadyForRetry() ([]*entities.DeadLetterItem,
 	} else {
 		return nil, args.Error(1)
 	}
+}
+
+func (m *MockDal) DeleteDeadLetterItems(dead []*entities.DeadLetterItem) error {
+	args := m.Mock.Called(dead)
+
+	return args.Error(0)
 }
 
 type MockQueue struct {
