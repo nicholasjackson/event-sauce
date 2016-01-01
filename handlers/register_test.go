@@ -128,6 +128,7 @@ func TestRegisterCreateWithValidRequestCreatesValidRegistration(t *testing.T) {
 	RegisterCreateHandler(&responseRecorder, &request)
 
 	registration := mockRegisterDeps.DalMock.UpsertObject
+	assert.NotZero(t, registration.Id)
 	assert.Equal(t, "event.something", registration.EventName)
 	assert.Equal(t, "http://some_callback_url.com", registration.CallbackUrl)
 }

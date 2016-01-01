@@ -1,9 +1,11 @@
 package main
 
 import (
+	"log"
 	"sync"
 	"time"
 
+	"github.com/nicholasjackson/event-sauce/global"
 	"github.com/nicholasjackson/event-sauce/logging"
 	"github.com/nicholasjackson/event-sauce/queue"
 	"github.com/nicholasjackson/event-sauce/workers"
@@ -16,6 +18,7 @@ type ClientDependencies struct {
 	DeadLetterQueue         queue.Queue           `inject:"deadletterqueue"`
 	EventWorkerFactory      workers.WorkerFactory `inject:"eventqueueworkerfactory"`
 	DeadLetterWorkerFactory workers.WorkerFactory `inject:"deadletterqueueworkerfactory"`
+	Log                     *log.Logger           `inject:""`
 }
 
 var ClientDeps *ClientDependencies = &ClientDependencies{}
@@ -32,6 +35,7 @@ func startClient(wg *sync.WaitGroup) {
 
 func processEventQueue() {
 	ClientDeps.Stats.Increment(EVENT_QUEUE_CLIENT_STARTED)
+	ClientDeps.Log.Println("Starting Event Queue")
 
 	ClientDeps.EventQueue.StartConsuming(10, time.Second, func(callbackItem interface{}) {
 		worker := ClientDeps.EventWorkerFactory.Create()
@@ -40,9 +44,13 @@ func processEventQueue() {
 }
 
 func processDeadLetterQueue() {
+	ClientDeps.Log.Println("Starting Dead Letter Queue")
 	ClientDeps.Stats.Increment(DEADLETTER_QUEUE_CLIENT_STARTED)
 
-	ClientDeps.DeadLetterQueue.StartConsuming(10, time.Second, func(callbackItem interface{}) {
+	// set polling to minimum retry duration
+	duration, _ := time.ParseDuration(global.Config.RetryIntervals[0])
+
+	ClientDeps.DeadLetterQueue.StartConsuming(10, duration, func(callbackItem interface{}) {
 		worker := ClientDeps.DeadLetterWorkerFactory.Create()
 		worker.HandleItem(callbackItem)
 	})

@@ -107,8 +107,8 @@ func (m *MockQueue) Add(event_name string, payload string) error {
 	return args.Error(0)
 }
 
-func (m *MockQueue) AddEvent(event *entities.Event) error {
-	args := m.Mock.Called(event)
+func (m *MockQueue) AddEvent(event *entities.Event, callback string) error {
+	args := m.Mock.Called(event, callback)
 	return args.Error(0)
 }
 

@@ -8,5 +8,6 @@
     "connection_string": {{key "/api/eventsauce/queue/connection_string"}},
     "event_queue": {{key "/api/eventsauce/queue/event_queue"}},
     "dead_letter_queue": {{key "/api/eventsauce/queue/dead_letter_queue"}}
-  }
+  },
+  "retry_intervals": {{key "/api/eventsauce/retry_intervals"}}
 }

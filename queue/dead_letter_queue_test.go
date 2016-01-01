@@ -38,8 +38,9 @@ func TestAddEventCreatesAValidDeadLetter(t *testing.T) {
 	event := &entities.Event{EventName: "soemthing"}
 	d, _ := time.ParseDuration(duration)
 
-	queue.AddEvent(event)
+	queue.AddEvent(event, "mycallback")
 
+	assert.Equal(t, "mycallback", mockDal.UpsertDeadLetter.CallbackUrl)
 	assert.Equal(t, 1, mockDal.UpsertDeadLetter.FailureCount)
 	assert.False(t, mockDal.UpsertDeadLetter.FirstFailureDate.IsZero())
 	assert.Equal(t,
@@ -66,6 +67,15 @@ func TestStartConsumingDeletesRetrievesDeadLettersFromQueue(t *testing.T) {
 	queue.runConsumer(1, func(item interface{}) {})
 
 	mockDal.Mock.AssertCalled(t, "DeleteDeadLetterItems", deadLetters)
+}
+
+func TestStartConsumingDoesNothingOnEmptyQueue(t *testing.T) {
+	SetupDeadTests(t)
+	deadLetters = nil
+
+	queue.runConsumer(1, func(item interface{}) {})
+
+	mockDal.Mock.AssertNotCalled(t, "DeleteDeadLetterItems", mock.Anything)
 }
 
 func TestStartConsumingCallsCallbackForEachDeadLetter(t *testing.T) {

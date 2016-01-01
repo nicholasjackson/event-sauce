@@ -2,6 +2,8 @@ package workers
 
 import (
 	"fmt"
+	"log"
+	"os"
 	"testing"
 	"time"
 
@@ -32,7 +34,7 @@ func getDeadRegistration() *entities.Registration {
 func setupDeadTests(t *testing.T) {
 	mockDeadDispatcher = &mocks.MockEventDispatcher{}
 	mockDeadDal = &mocks.MockDal{}
-	deadWorker = NewDeadLetterWorker(mockDeadDispatcher, mockDeadDal)
+	deadWorker = NewDeadLetterWorker(mockDeadDispatcher, mockDeadDal, log.New(os.Stdout, "testing: ", log.Lshortfile))
 	deadReg = []*entities.Registration{&entities.Registration{CallbackUrl: "myendpoint"}}
 
 	global.Config.RetryIntervals = []string{"1d", "2d", "5d"}

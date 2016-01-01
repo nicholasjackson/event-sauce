@@ -26,7 +26,12 @@ func New(connectionString string, dataBaseName string) (*MongoDal, error) {
 }
 
 func (m *MongoDal) GetRegistrationByEventAndCallback(event string, callback_url string) (*entities.Registration, error) {
-	query := m.findRegistrations(bson.M{"event_name": event, "callback_url": callback_url})
+	session := m.mainSession.New()
+	defer session.Close()
+
+	c := session.DB(m.dataBaseName).C("registrations")
+	query := c.Find(bson.M{"event_name": event, "callback_url": callback_url})
+
 	registration := entities.Registration{}
 
 	err := query.One(&registration)
@@ -34,11 +39,17 @@ func (m *MongoDal) GetRegistrationByEventAndCallback(event string, callback_url 
 		log.Printf("Find Registration Error: %v\n", err)
 		return nil, err
 	}
+
 	return &registration, nil
 }
 
 func (m *MongoDal) GetRegistrationsByEvent(event string) ([]*entities.Registration, error) {
-	query := m.findRegistrations(bson.M{"event_name": event})
+	session := m.mainSession.New()
+	defer session.Close()
+
+	c := session.DB(m.dataBaseName).C("registrations")
+	query := c.Find(bson.M{"event_name": event})
+
 	registrations := []*entities.Registration{}
 
 	err := query.All(&registrations)
@@ -46,6 +57,7 @@ func (m *MongoDal) GetRegistrationsByEvent(event string) ([]*entities.Registrati
 		log.Printf("Find Registration Error: %v\n", err)
 		return nil, err
 	}
+
 	return registrations, nil
 }
 
@@ -53,6 +65,8 @@ func (m *MongoDal) UpsertRegistration(registration *entities.Registration) error
 	log.Printf("Create new Registration: %v\n", registration)
 
 	session := m.mainSession.New()
+	defer session.Close()
+
 	c := session.DB(m.dataBaseName).C("registrations")
 	_, err := c.UpsertId(registration.Id, registration)
 
@@ -62,6 +76,8 @@ func (m *MongoDal) UpsertRegistration(registration *entities.Registration) error
 func (m *MongoDal) DeleteRegistration(registration *entities.Registration) error {
 	log.Printf("Delete Registration: %v\n", registration)
 	session := m.mainSession.New()
+	defer session.Close()
+
 	c := session.DB(m.dataBaseName).C("registrations")
 	err := c.RemoveId(registration.Id)
 	fmt.Println("Error: ", err)
@@ -73,6 +89,8 @@ func (m *MongoDal) UpsertEventStore(event *entities.EventStoreItem) error {
 	log.Printf("Create new Event: %v\n", event)
 
 	session := m.mainSession.New()
+	defer session.Close()
+
 	c := session.DB(m.dataBaseName).C("events")
 	_, err := c.UpsertId(event.Id, event)
 
@@ -83,6 +101,8 @@ func (m *MongoDal) UpsertDeadLetterItem(dead *entities.DeadLetterItem) error {
 	log.Printf("Create new Dead letter: %v\n", dead)
 
 	session := m.mainSession.New()
+	defer session.Close()
+
 	c := session.DB(m.dataBaseName).C("dead_letters")
 	_, err := c.UpsertId(dead.Id, dead)
 
@@ -91,24 +111,30 @@ func (m *MongoDal) UpsertDeadLetterItem(dead *entities.DeadLetterItem) error {
 
 func (m *MongoDal) GetDeadLetterItemsReadyForRetry() ([]*entities.DeadLetterItem, error) {
 	deadletters := []*entities.DeadLetterItem{}
+
 	session := m.mainSession.New()
+	defer session.Close()
+
 	c := session.DB(m.dataBaseName).C("dead_letters")
 	currentTime := time.Now()
 	err := c.Find(bson.M{
 		"next_retry_date": bson.M{
 			"$lte": currentTime,
 		},
-	}).All(deadletters)
+	}).All(&deadletters)
 
 	if err != nil {
 		log.Printf("Find Registration Error: %v\n", err)
 		return nil, err
 	}
+
 	return deadletters, nil
 }
 
 func (m *MongoDal) DeleteDeadLetterItems(dead []*entities.DeadLetterItem) error {
 	session := m.mainSession.New()
+	defer session.Close()
+
 	c := session.DB(m.dataBaseName).C("dead_letters")
 
 	for _, letter := range dead {
@@ -116,11 +142,4 @@ func (m *MongoDal) DeleteDeadLetterItems(dead []*entities.DeadLetterItem) error 
 	}
 
 	return nil
-}
-
-func (m *MongoDal) findRegistrations(bson interface{}) *mgo.Query {
-	session := m.mainSession.New()
-	c := session.DB(m.dataBaseName).C("registrations")
-
-	return c.Find(bson)
 }

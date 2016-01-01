@@ -2,6 +2,8 @@ package workers
 
 import (
 	"fmt"
+	"log"
+	"os"
 	"testing"
 
 	"github.com/nicholasjackson/event-sauce/entities"
@@ -25,7 +27,7 @@ func setupTests(t *testing.T) {
 	mockDispatcher = &mocks.MockEventDispatcher{}
 	mockDal = &mocks.MockDal{}
 	mockQueue = &mocks.MockQueue{}
-	worker = New(mockDispatcher, mockDal, mockQueue)
+	worker = New(mockDispatcher, mockDal, mockQueue, log.New(os.Stdout, "Testing: ", log.Lshortfile))
 	registrations = []*entities.Registration{&entities.Registration{CallbackUrl: "myendpoint"}}
 
 	global.Config.RetryIntervals = []string{"1d"}
@@ -35,7 +37,7 @@ func setupTests(t *testing.T) {
 	mockDal.Mock.On("DeleteRegistration", mock.Anything).Return(nil)
 	mockDal.Mock.On("UpsertEventStore", mock.Anything).Return(nil)
 	mockDal.Mock.On("UpsertDeadLetterItem", mock.Anything).Return(nil)
-	mockQueue.Mock.On("AddEvent", mock.Anything).Return(nil)
+	mockQueue.Mock.On("AddEvent", mock.Anything, mock.Anything).Return(nil)
 }
 
 func TestSetsEventDispatcherAndDal(t *testing.T) {

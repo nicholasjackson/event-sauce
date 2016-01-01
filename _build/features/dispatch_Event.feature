@@ -15,6 +15,11 @@ Background:
 				{
 					"method": "POST",
 					"path": "/v1/othercallback"
+				},
+				{
+					"method": "POST",
+					"path": "/v1/unhealthy",
+					"code": 500
 				}
 			]}
 		"""
@@ -90,5 +95,5 @@ Scenario: Dispatch an event to a one unhealthy consumers, should result in an ev
 				}
 			}
 		"""
-	Then I expect 1 event on the dead letter queue
+	And 1 deadletteritems exist with callback_url: "http://callbackservers/v1/unhealthy"
 	And 1 registrations should exist with event_name: "mytest.event", callback_url: "http://callbackservers/v1/unhealthy"

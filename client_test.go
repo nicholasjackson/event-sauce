@@ -1,6 +1,8 @@
 package main
 
 import (
+	"log"
+	"os"
 	"sync"
 	"testing"
 	"time"
@@ -47,6 +49,8 @@ func SetupClientTest(t *testing.T) {
 	mockWorker = &mocks.MockWorker{}
 	mockDeadLetterWorker = &mocks.MockWorker{}
 
+	global.Config.RetryIntervals = []string{"10s"}
+
 	testWaitGroup = sync.WaitGroup{}
 	testWaitGroup.Add(1)
 
@@ -54,6 +58,7 @@ func SetupClientTest(t *testing.T) {
 		&inject.Object{Value: ClientDeps},
 		&inject.Object{Value: mockClientDeps},
 		&inject.Object{Value: statsDMock, Name: "statsd"},
+		&inject.Object{Value: log.New(os.Stdout, "Testing: ", log.Lshortfile)},
 		&inject.Object{Value: eventQueueMock, Name: "eventqueue"},
 		&inject.Object{Value: deadLetterQueueMock, Name: "deadletterqueue"},
 		&inject.Object{Value: mockEventWorkerFactory, Name: "eventqueueworkerfactory"},
@@ -118,12 +123,13 @@ func TestDeadLetterQueueClientCreateCallsStatsD(t *testing.T) {
 }
 
 func TestDeadLetterQueueClientStartsPolling(t *testing.T) {
+	duration, _ := time.ParseDuration("10s")
 	SetupClientTest(t)
 
 	startClient(&testWaitGroup)
 	time.Sleep(10 * time.Millisecond) // wait for prcessEventQueue to start
 
-	mockClientDeps.DeadLetterQueueMock.Mock.AssertCalled(t, "StartConsuming", mock.Anything, mock.Anything, mock.Anything)
+	mockClientDeps.DeadLetterQueueMock.Mock.AssertCalled(t, "StartConsuming", mock.Anything, duration, mock.Anything)
 }
 
 func TestDeadLetterQueueClientCreatesWorkerWhenItemDeQueued(t *testing.T) {

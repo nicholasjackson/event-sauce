@@ -1,3 +1,3 @@
-Then(/^I wait just a second$/) do
-  sleep 1
+Then(/^I wait (\d+) second$/) do |seconds|
+  sleep seconds.to_i
 end

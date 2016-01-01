@@ -4,6 +4,7 @@ class Event
   field :payload,    type: String
 
   embedded_in :deadletteritem
+  embedded_in :eventstoreitem
 end
 
 class EventStoreItem
@@ -13,6 +14,8 @@ class EventStoreItem
   field :_id,           type: Moped::BSON::ObjectId
   field :event,         type: Event
   field :creation_date, type: DateTime
+
+  embeds_one :event
 end
 
 class DeadLetterItem
@@ -36,7 +39,7 @@ FactoryGirl.define do
   end
 
   factory :eventstoreitem, class: EventStoreItem do
-    event
+    association :event, factory: :event, strategy: :build
     creation_date Time.now
   end
 
@@ -45,6 +48,7 @@ FactoryGirl.define do
     failure_count 1
     callback_url "http://myserver.com/v1/newemail"
     first_failure_date Time.now
+    next_retry_date Time.now
   end
 
 end

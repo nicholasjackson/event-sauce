@@ -1,6 +1,7 @@
 package queue
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/nicholasjackson/event-sauce/data"
@@ -9,17 +10,22 @@ import (
 )
 
 type DeadLetterQueue struct {
-	Dal data.Dal `inject:"dal"`
+	Dal data.Dal
+}
+
+func NewDeadLetterQueue(dataAccessLayer data.Dal) (*DeadLetterQueue, error) {
+	return &DeadLetterQueue{Dal: dataAccessLayer}, nil
 }
 
 func (d *DeadLetterQueue) Add(event_name string, payload string) error {
 	return nil
 }
 
-func (d *DeadLetterQueue) AddEvent(event *entities.Event) error {
+func (d *DeadLetterQueue) AddEvent(event *entities.Event, callback string) error {
 	deadLetter := entities.NewDeadLetterItem(*event)
 	duration, _ := time.ParseDuration(global.Config.RetryIntervals[0])
 
+	deadLetter.CallbackUrl = callback
 	deadLetter.FailureCount = 1
 	deadLetter.FirstFailureDate = time.Now()
 	deadLetter.NextRetryDate = deadLetter.FirstFailureDate.Add(duration)
@@ -35,7 +41,13 @@ func (d *DeadLetterQueue) StartConsuming(size int, poll_interval time.Duration, 
 }
 
 func (d *DeadLetterQueue) runConsumer(size int, callback func(callbackItem interface{})) {
-	deadLetters, _ := d.Dal.GetDeadLetterItemsReadyForRetry()
+	deadLetters, err := d.Dal.GetDeadLetterItemsReadyForRetry()
+
+	if deadLetters == nil || err != nil {
+		fmt.Println("Nothing to do")
+		return
+	}
+
 	// remove the retrieved items from the queue to ensure that no other worker picks them up when processing
 	// the worker will re-add to the queue in the event of failure
 	_ = d.Dal.DeleteDeadLetterItems(deadLetters)

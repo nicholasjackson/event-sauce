@@ -16,7 +16,7 @@ Scenario: Receive a valid event
 		"""
 	Then the response status should be "200"
 	And the JSON response should have "$..status_event" with the text "OK"
-	And I wait just a second
+	And I wait 1 second
   And 1 eventstoreitems should exist with event name "mytest.event"
 
 Scenario: Receive a event with no payload
@@ -35,5 +35,5 @@ Scenario: Receive a event with no event_name
 		}
 	"""
 	Then the response status should be "400"
-	And I wait just a second
+	And I wait 1 second
   And 0 eventstoreitems should exist with event name "mytest.event"

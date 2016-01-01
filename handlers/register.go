@@ -41,10 +41,8 @@ func RegisterCreateHandler(rw http.ResponseWriter, r *http.Request) {
 
 	if r, _ := RegisterHandlerDependencies.Dal.GetRegistrationByEventAndCallback(
 		request.EventName, request.CallbackUrl); r == nil {
-		registration := &entities.Registration{}
-		registration.EventName = request.EventName
-		registration.CallbackUrl = request.CallbackUrl
-		_ = RegisterHandlerDependencies.Dal.UpsertRegistration(registration)
+		registration := entities.CreateNewRegistration(request.EventName, request.CallbackUrl)
+		_ = RegisterHandlerDependencies.Dal.UpsertRegistration(&registration)
 	} else {
 		http.Error(rw, "Registration not modified", http.StatusNotModified)
 	}

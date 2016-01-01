@@ -1,7 +1,7 @@
 package workers
 
 import (
-	"fmt"
+	"log"
 
 	"github.com/nicholasjackson/event-sauce/data"
 	"github.com/nicholasjackson/event-sauce/entities"
@@ -12,15 +12,17 @@ type EventQueueWorker struct {
 	eventDispatcher EventDispatcher
 	dal             data.Dal
 	deadLetterQueue queue.Queue
+	log             *log.Logger
 }
 
-func New(eventDispatcher EventDispatcher, dal data.Dal, deadLetterQueue queue.Queue) *EventQueueWorker {
-	return &EventQueueWorker{eventDispatcher: eventDispatcher, dal: dal, deadLetterQueue: deadLetterQueue}
+const EQWTAGNAME = "EventQueueWorker: "
+
+func New(eventDispatcher EventDispatcher, dal data.Dal, deadLetterQueue queue.Queue, log *log.Logger) *EventQueueWorker {
+	return &EventQueueWorker{eventDispatcher: eventDispatcher, dal: dal, deadLetterQueue: deadLetterQueue, log: log}
 }
 
 func (m *EventQueueWorker) HandleItem(item interface{}) error {
 	event := item.(*entities.Event)
-
 	_ = m.saveEventToStore(event)
 
 	registrations, _ := m.dal.GetRegistrationsByEvent(event.EventName)
@@ -33,35 +35,38 @@ func (m *EventQueueWorker) HandleItem(item interface{}) error {
 }
 
 func (m *EventQueueWorker) processEvent(event *entities.Event, registration *entities.Registration) {
-	fmt.Println("Processing Event:", event)
+	m.log.Printf("%vProcessing event: %v for: %v\n", EQWTAGNAME, event.EventName, registration.CallbackUrl)
 
 	code, _ := m.eventDispatcher.DispatchEvent(event, registration.CallbackUrl)
+	m.log.Printf("%vEvent dispatched: %v for: %v return code: %v\n", EQWTAGNAME, event.EventName, registration.CallbackUrl, code)
 
-	fmt.Println("processEvent: Finshed: ", code)
 	switch code {
 	case 404:
-		fmt.Println("processEvent: Not Found")
+		m.log.Println(EQWTAGNAME, "processEvent: Not Found")
 		m.deleteRegistration(registration)
 		break
 	case 200:
-		fmt.Println("processEvent: Dispatched OK")
+		m.log.Println(EQWTAGNAME, "processEvent: Dispatched OK")
 		break
 	default:
-		fmt.Println("processEvent: Not healthy")
+		m.log.Println(EQWTAGNAME, "processEvent: Not healthy")
 		m.addToDeadLetterQueue(event, registration.CallbackUrl)
 		break
 	}
 }
 
 func (m *EventQueueWorker) deleteRegistration(registration *entities.Registration) {
+	m.log.Printf("%vDelete registration: %v for: %v\n", EQWTAGNAME, registration.EventName, registration.CallbackUrl)
 	m.dal.DeleteRegistration(registration)
 }
 
 func (m *EventQueueWorker) addToDeadLetterQueue(event *entities.Event, endpoint string) {
-	m.deadLetterQueue.AddEvent(event)
+	m.log.Printf("%vQueue for redelivery: %v for: %v\n", EQWTAGNAME, event.EventName, endpoint)
+	m.deadLetterQueue.AddEvent(event, endpoint)
 }
 
 func (m *EventQueueWorker) saveEventToStore(event *entities.Event) error {
+	m.log.Printf("%vSave to event store: %v\n", EQWTAGNAME, event.EventName)
 	eventStore := entities.NewEventStoreItem(*event)
 	return m.dal.UpsertEventStore(&eventStore)
 }

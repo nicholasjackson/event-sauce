@@ -15,7 +15,7 @@ type RedisQueue struct {
 	callback func(callbackItem interface{})
 }
 
-func New(connectionString string, queueName string) (*RedisQueue, error) {
+func NewRedisQueue(connectionString string, queueName string) (*RedisQueue, error) {
 	connection := rmq.OpenConnection("my service", "tcp", connectionString, 1)
 	taskQueue := connection.OpenQueue(queueName)
 
@@ -25,10 +25,10 @@ func New(connectionString string, queueName string) (*RedisQueue, error) {
 func (r *RedisQueue) Add(eventName string, payload string) error {
 	queuePayload := entities.Event{EventName: eventName, Payload: payload}
 
-	return r.AddEvent(&queuePayload)
+	return r.AddEvent(&queuePayload, "")
 }
 
-func (r *RedisQueue) AddEvent(event *entities.Event) error {
+func (r *RedisQueue) AddEvent(event *entities.Event, callback string) error {
 	payloadBytes, err := json.Marshal(event)
 	if err != nil {
 		// handle error
@@ -41,7 +41,6 @@ func (r *RedisQueue) AddEvent(event *entities.Event) error {
 }
 
 func (r *RedisQueue) StartConsuming(size int, pollInterval time.Duration, callback func(callbackItem interface{})) {
-	fmt.Println("StartConsuming")
 	r.callback = callback
 	r.Queue.StartConsuming(size, pollInterval)
 	r.Queue.AddConsumer("RedisQueue_"+r.name, r)
@@ -59,8 +58,7 @@ func (r *RedisQueue) Consume(delivery rmq.Delivery) {
 		delivery.Reject()
 		return
 	}
+	delivery.Ack()
 
 	r.callback(&event)
-
-	delivery.Ack()
 }

@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"sync"
 
@@ -38,11 +39,14 @@ func setupInjection() {
 		&inject.Object{Value: handlers.RegisterHandlerDependencies},
 		&inject.Object{Value: handlers.EventHandlerDependencies},
 		&inject.Object{Value: ClientDeps},
+		&inject.Object{Value: createLogger()},
 		&inject.Object{Value: createStatsDClient(), Name: "statsd"},
 		&inject.Object{Value: createMongoClient(), Name: "dal"},
 		&inject.Object{Value: createEventQueueClient(), Name: "eventqueue"},
+		&inject.Object{Value: createDeadLetterQueueClient(), Name: "deadletterqueue"},
 		&inject.Object{Value: createEventDispatcher(), Name: "eventdispatcher"},
 		&inject.Object{Value: createEventQueueWorkerFactory(), Name: "eventqueueworkerfactory"},
+		&inject.Object{Value: createDeadLetterQueueWorkerFactory(), Name: "deadletterqueueworkerfactory"},
 	)
 
 	if err != nil {
@@ -67,18 +71,34 @@ func createMongoClient() *data.MongoDal {
 	return dal
 }
 
+func createEventDispatcher() workers.EventDispatcher {
+	return &workers.HTTPEventDispatcher{}
+}
+
 func createEventQueueClient() *queue.RedisQueue {
-	queue, err := queue.New(global.Config.Queue.ConnectionString, global.Config.Queue.EventQueue)
+	queue, err := queue.NewRedisQueue(global.Config.Queue.ConnectionString, global.Config.Queue.EventQueue)
 	if err != nil {
 		panic(fmt.Sprintln("Unable to create Queue: ", err))
 	}
 	return queue
 }
 
-func createEventDispatcher() workers.EventDispatcher {
-	return &workers.HTTPEventDispatcher{}
-}
-
 func createEventQueueWorkerFactory() workers.WorkerFactory {
 	return &workers.EventQueueWorkerFactory{}
+}
+
+func createDeadLetterQueueClient() *queue.DeadLetterQueue {
+	queue, err := queue.NewDeadLetterQueue(createMongoClient())
+	if err != nil {
+		panic(fmt.Sprintln("Unable to create Queue: ", err))
+	}
+	return queue
+}
+
+func createDeadLetterQueueWorkerFactory() workers.WorkerFactory {
+	return &workers.DeadLetterQueueWorkerFactory{}
+}
+
+func createLogger() *log.Logger {
+	return log.New(os.Stdout, "EventSauce: ", log.Lshortfile)
 }
