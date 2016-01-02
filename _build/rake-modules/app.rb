@@ -65,7 +65,7 @@ namespace :app do
   	begin
       puts `docker-compose -f ./dockercompose/#{DOCKER_IMAGE_NAME}/docker-compose.yml up -d`
       sleep 2
-  		setConsulVariables host, 9500
+  		setConsulVariables host, './consul_keys.yaml'
 
       sh "docker-compose -f ./dockercompose/#{DOCKER_IMAGE_NAME}/docker-compose.yml logs"
   	rescue SystemExit, Interrupt
@@ -103,7 +103,7 @@ namespace :app do
   	begin
   	  puts `docker-compose -f ./dockercompose/#{DOCKER_IMAGE_NAME}/docker-compose.yml up -d`
       sleep 2
-  		setConsulVariables host, 9500
+  		setConsulVariables host, './consul_keys.yaml'
   		self.wait_until_server_running ENV['WEB_SERVER_URI'], 0
 
   		p 'Running Tests'
