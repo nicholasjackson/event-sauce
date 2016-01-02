@@ -1,8 +1,10 @@
 package handlers
 
 import (
+	"log"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
 
 	"github.com/facebookgo/inject"
@@ -27,6 +29,7 @@ func SetupHealthTest(t *testing.T) {
 	_ = global.SetupInjection(
 		&inject.Object{Value: HealthHandlerDependencies},
 		&inject.Object{Value: mockHealthDeps},
+		&inject.Object{Value: log.New(os.Stdout, "tester", log.Lshortfile)},
 		&inject.Object{Value: statsDMock, Name: "statsd"},
 	)
 

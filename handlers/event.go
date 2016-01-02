@@ -3,6 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"io/ioutil"
+	"log"
 	"net/http"
 
 	"github.com/nicholasjackson/event-sauce/logging"
@@ -18,14 +19,17 @@ type EventDependencies struct {
 	// statsD interface must use a name type as injection cannot infer ducktypes
 	Stats logging.StatsD `inject:"statsd"`
 	Queue queue.Queue    `inject:"eventqueue"`
+	Log   *log.Logger    `inject:""`
 }
 
 var EventHandlerDependencies *EventDependencies = &EventDependencies{}
 
-const EVENT_HANDLER_CALLED = "eventsauce.event_handler.new"
+const EVENT_HANDLER_CALLED = "eventsauce.event_handler.post"
+const EHTAGNAME = "EventHandler: "
 
 func EventHandler(rw http.ResponseWriter, r *http.Request) {
 	EventHandlerDependencies.Stats.Increment(EVENT_HANDLER_CALLED)
+	EventHandlerDependencies.Log.Printf("%vHandler Called POST\n", EHTAGNAME)
 
 	defer r.Body.Close()
 	data, _ := ioutil.ReadAll(r.Body)

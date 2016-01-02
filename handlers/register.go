@@ -3,6 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"io/ioutil"
+	"log"
 	"net/http"
 
 	"github.com/nicholasjackson/event-sauce/data"
@@ -19,15 +20,18 @@ type RegisterDependencies struct {
 	// statsD interface must use a name type as injection cannot infer ducktypes
 	Stats logging.StatsD `inject:"statsd"`
 	Dal   data.Dal       `inject:"dal"`
+	Log   *log.Logger    `inject:""`
 }
 
 var RegisterHandlerDependencies *RegisterDependencies = &RegisterDependencies{}
 
-const REGISTER_CREATE_HANDLER_CALLED = "eventsauce.register_handler.create"
+const REGISTER_CREATE_HANDLER_CALLED = "eventsauce.register_handler.post"
 const REGISTER_DELETE_HANDLER_CALLED = "eventsauce.register_handler.delete"
+const RHTAGNAME = "RegisterHandler: "
 
 func RegisterCreateHandler(rw http.ResponseWriter, r *http.Request) {
 	RegisterHandlerDependencies.Stats.Increment(REGISTER_CREATE_HANDLER_CALLED)
+	RegisterHandlerDependencies.Log.Printf("%vHandler Called POST\n", RHTAGNAME)
 
 	defer r.Body.Close()
 	data, _ := ioutil.ReadAll(r.Body)
@@ -56,6 +60,7 @@ func RegisterCreateHandler(rw http.ResponseWriter, r *http.Request) {
 
 func RegisterDeleteHandler(rw http.ResponseWriter, r *http.Request) {
 	RegisterHandlerDependencies.Stats.Increment(REGISTER_DELETE_HANDLER_CALLED)
+	RegisterHandlerDependencies.Log.Printf("%vHandler Called DELETE\n", RHTAGNAME)
 
 	defer r.Body.Close()
 	data, _ := ioutil.ReadAll(r.Body)

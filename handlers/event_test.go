@@ -3,8 +3,10 @@ package handlers
 import (
 	"bytes"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
 
 	"github.com/facebookgo/inject"
@@ -31,6 +33,7 @@ func SetupEventTest(t *testing.T) {
 	_ = global.SetupInjection(
 		&inject.Object{Value: EventHandlerDependencies},
 		&inject.Object{Value: mockEventDeps},
+		&inject.Object{Value: log.New(os.Stdout, "tester", log.Lshortfile)},
 		&inject.Object{Value: statsDMock, Name: "statsd"},
 		&inject.Object{Value: queueMock, Name: "eventqueue"},
 	)
