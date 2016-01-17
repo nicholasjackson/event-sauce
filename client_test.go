@@ -10,6 +10,7 @@ import (
 	"github.com/facebookgo/inject"
 	"github.com/nicholasjackson/event-sauce/entities"
 	"github.com/nicholasjackson/event-sauce/global"
+	"github.com/nicholasjackson/event-sauce/handlers"
 	"github.com/nicholasjackson/event-sauce/mocks"
 	"github.com/nicholasjackson/event-sauce/workers"
 	"github.com/stretchr/testify/mock"
@@ -81,7 +82,7 @@ func TestEventQueueClientCreateCallsStatsD(t *testing.T) {
 	startClient(&testWaitGroup)
 	time.Sleep(10 * time.Millisecond) // wait for prcessEventQueue to start
 
-	mockClientDeps.StatsMock.Mock.AssertCalled(t, "Increment", EVENT_QUEUE_CLIENT_STARTED)
+	mockClientDeps.StatsMock.Mock.AssertCalled(t, "Increment", handlers.EVENT_QUEUE+handlers.STARTED)
 }
 
 func TestEventQueueClientStartsPolling(t *testing.T) {
@@ -119,7 +120,7 @@ func TestDeadLetterQueueClientCreateCallsStatsD(t *testing.T) {
 	startClient(&testWaitGroup)
 	time.Sleep(10 * time.Millisecond) // wait for prcessEventQueue to start
 
-	mockClientDeps.StatsMock.Mock.AssertCalled(t, "Increment", DEADLETTER_QUEUE_CLIENT_STARTED)
+	mockClientDeps.StatsMock.Mock.AssertCalled(t, "Increment", handlers.DEAD_LETTER_QUEUE+handlers.STARTED)
 }
 
 func TestDeadLetterQueueClientStartsPolling(t *testing.T) {

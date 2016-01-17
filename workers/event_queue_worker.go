@@ -25,12 +25,17 @@ func New(eventDispatcher EventDispatcher, dal data.Dal, deadLetterQueue queue.Qu
 }
 
 func (m *EventQueueWorker) HandleItem(item interface{}) error {
-	m.statsD.Increment(handlers.EVENT_QUEUE_WORKER + handlers.HANDLE)
+	m.statsD.Increment(handlers.EVENT_QUEUE + handlers.WORKER + handlers.HANDLE)
 
 	event := item.(*entities.Event)
 	_ = m.saveEventToStore(event)
 
 	registrations, _ := m.dal.GetRegistrationsByEvent(event.EventName)
+
+	if len(registrations) < 1 {
+		m.statsD.Increment(handlers.EVENT_QUEUE + handlers.WORKER + handlers.NO_ENDPOINT)
+		return nil
+	}
 
 	for _, registration := range registrations {
 		m.processEvent(event, registration)
@@ -49,16 +54,16 @@ func (m *EventQueueWorker) processEvent(event *entities.Event, registration *ent
 	case 404:
 		m.log.Println(EQWTAGNAME, "processEvent: Not Found")
 		m.deleteRegistration(registration)
-		m.statsD.Increment(handlers.EVENT_QUEUE_WORKER + handlers.DELETE_REGISTRATION)
+		m.statsD.Increment(handlers.EVENT_QUEUE + handlers.WORKER + handlers.DELETE_REGISTRATION)
 		break
 	case 200:
 		m.log.Println(EQWTAGNAME, "processEvent: Dispatched OK")
-		m.statsD.Increment(handlers.EVENT_QUEUE_WORKER + handlers.DISPATCH)
+		m.statsD.Increment(handlers.EVENT_QUEUE + handlers.WORKER + handlers.DISPATCH)
 		break
 	default:
 		m.log.Println(EQWTAGNAME, "processEvent: Not healthy")
 		m.addToDeadLetterQueue(event, registration.CallbackUrl)
-		m.statsD.Increment(handlers.EVENT_QUEUE_WORKER + handlers.PROCESS_REDELIVERY)
+		m.statsD.Increment(handlers.EVENT_QUEUE + handlers.WORKER + handlers.PROCESS_REDELIVERY)
 		break
 	}
 }

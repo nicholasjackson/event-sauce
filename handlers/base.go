@@ -11,6 +11,7 @@ const (
 	DELETE              = ".delete"
 	CALLED              = ".called"
 	SUCCESS             = ".success"
+	STARTED             = ".started"
 	PROCESS_REDELIVERY  = ".process_redelivery"
 	DELETE_REGISTRATION = ".delete_registration"
 	NO_ENDPOINT         = ".no_registered_endpoint"
@@ -27,6 +28,7 @@ const (
 	HEALTH_HANDLER      = "eventsauce.health"
 	EVENT_HANDLER       = "eventsauce.event"
 	REGISTER_HANDLER    = "eventsauce.register"
-	EVENT_QUEUE_WORKER  = "eventsauce.event_queue_worker"
-	DEAD_LETTER_WORKER  = "eventsauce.dead_letter_worker"
+	EVENT_QUEUE         = "event_sauce.event_queue"
+	DEAD_LETTER_QUEUE   = "event_sauce.dead_letter_queue"
+	WORKER              = ".worker"
 )

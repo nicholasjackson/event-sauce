@@ -58,7 +58,7 @@ func TestHandleEventSavesToEventStore(t *testing.T) {
 	_ = worker.HandleItem(event)
 
 	mockDal.Mock.AssertCalled(t, "UpsertEventStore", mock.Anything)
-	mockStatsD.Mock.AssertCalled(t, "Increment", handlers.EVENT_QUEUE_WORKER+handlers.HANDLE)
+	mockStatsD.Mock.AssertCalled(t, "Increment", handlers.EVENT_QUEUE+handlers.WORKER+handlers.HANDLE)
 }
 
 func TestHandleEventAttemptsToDispatchEvent(t *testing.T) {
@@ -69,7 +69,7 @@ func TestHandleEventAttemptsToDispatchEvent(t *testing.T) {
 	_ = worker.HandleItem(event)
 
 	mockDispatcher.Mock.AssertCalled(t, "DispatchEvent", event, endpoint)
-	mockStatsD.Mock.AssertCalled(t, "Increment", handlers.EVENT_QUEUE_WORKER+handlers.DISPATCH)
+	mockStatsD.Mock.AssertCalled(t, "Increment", handlers.EVENT_QUEUE+handlers.WORKER+handlers.DISPATCH)
 }
 
 func TestHandleEventAttemptsToDispatchMultipleEvent(t *testing.T) {
@@ -107,7 +107,7 @@ func TestDispatchEventFailureRemovesRegistrationWhenRegistrationFoundAndEndpoint
 	_ = worker.HandleItem(event)
 
 	mockDal.Mock.AssertCalled(t, "DeleteRegistration", registrations[0])
-	mockStatsD.Mock.AssertCalled(t, "Increment", handlers.EVENT_QUEUE_WORKER+handlers.DELETE_REGISTRATION)
+	mockStatsD.Mock.AssertCalled(t, "Increment", handlers.EVENT_QUEUE+handlers.WORKER+handlers.DELETE_REGISTRATION)
 }
 
 func TestDispatchEventFailureAddsEventToDeadLetterQueueWhenEndpointInErrorState(t *testing.T) {
@@ -121,7 +121,7 @@ func TestDispatchEventFailureAddsEventToDeadLetterQueueWhenEndpointInErrorState(
 	_ = worker.HandleItem(event)
 
 	mockQueue.Mock.AssertNumberOfCalls(t, "AddEvent", 1)
-	mockStatsD.Mock.AssertCalled(t, "Increment", handlers.EVENT_QUEUE_WORKER+handlers.PROCESS_REDELIVERY)
+	mockStatsD.Mock.AssertCalled(t, "Increment", handlers.EVENT_QUEUE+handlers.WORKER+handlers.PROCESS_REDELIVERY)
 }
 
 func TestDispatchEventOKDoesNothing(t *testing.T) {
@@ -132,5 +132,5 @@ func TestDispatchEventOKDoesNothing(t *testing.T) {
 
 	mockDal.Mock.AssertNumberOfCalls(t, "DeleteRegistration", 0)
 	mockQueue.Mock.AssertNumberOfCalls(t, "AddEvent", 0)
-	mockStatsD.Mock.AssertCalled(t, "Increment", handlers.EVENT_QUEUE_WORKER+handlers.DISPATCH)
+	mockStatsD.Mock.AssertCalled(t, "Increment", handlers.EVENT_QUEUE+handlers.WORKER+handlers.DISPATCH)
 }

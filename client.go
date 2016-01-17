@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/nicholasjackson/event-sauce/global"
+	"github.com/nicholasjackson/event-sauce/handlers"
 	"github.com/nicholasjackson/event-sauce/logging"
 	"github.com/nicholasjackson/event-sauce/queue"
 	"github.com/nicholasjackson/event-sauce/workers"
@@ -23,9 +24,6 @@ type ClientDependencies struct {
 
 var ClientDeps *ClientDependencies = &ClientDependencies{}
 
-const EVENT_QUEUE_CLIENT_STARTED = "eventsauce.eventqueue.client.started"
-const DEADLETTER_QUEUE_CLIENT_STARTED = "eventsauce.deadletterqueue.client.started"
-
 func startClient(wg *sync.WaitGroup) {
 	defer wg.Done()
 
@@ -34,7 +32,7 @@ func startClient(wg *sync.WaitGroup) {
 }
 
 func processEventQueue() {
-	ClientDeps.Stats.Increment(EVENT_QUEUE_CLIENT_STARTED)
+	ClientDeps.Stats.Increment(handlers.EVENT_QUEUE + handlers.STARTED)
 	ClientDeps.Log.Println("Starting Event Queue")
 
 	ClientDeps.EventQueue.StartConsuming(10, time.Second, func(callbackItem interface{}) {
@@ -45,7 +43,7 @@ func processEventQueue() {
 
 func processDeadLetterQueue() {
 	ClientDeps.Log.Println("Starting Dead Letter Queue")
-	ClientDeps.Stats.Increment(DEADLETTER_QUEUE_CLIENT_STARTED)
+	ClientDeps.Stats.Increment(handlers.DEAD_LETTER_QUEUE + handlers.STARTED)
 
 	// set polling to minimum retry duration
 	duration, _ := time.ParseDuration(global.Config.RetryIntervals[0])

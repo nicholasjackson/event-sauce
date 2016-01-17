@@ -62,8 +62,8 @@ func TestHandleItemDoesNothingIfNoRegisteredEndpoint(t *testing.T) {
 	deadWorker.HandleItem(deadLetter)
 
 	mockDeadDispatcher.Mock.AssertNotCalled(t, "DispatchEvent", mock.Anything, mock.Anything)
-	mockDeadStatsD.Mock.AssertCalled(t, "Increment", handlers.DEAD_LETTER_WORKER+handlers.HANDLE)
-	mockDeadStatsD.Mock.AssertCalled(t, "Increment", handlers.DEAD_LETTER_WORKER+handlers.NO_ENDPOINT)
+	mockDeadStatsD.Mock.AssertCalled(t, "Increment", handlers.DEAD_LETTER_QUEUE+handlers.WORKER+handlers.HANDLE)
+	mockDeadStatsD.Mock.AssertCalled(t, "Increment", handlers.DEAD_LETTER_QUEUE+handlers.WORKER+handlers.NO_ENDPOINT)
 }
 
 func TestHandleItemDispatchesEvent(t *testing.T) {
@@ -75,7 +75,7 @@ func TestHandleItemDispatchesEvent(t *testing.T) {
 	deadWorker.HandleItem(deadLetter)
 
 	mockDeadDispatcher.Mock.AssertCalled(t, "DispatchEvent", mock.Anything, deadLetter.CallbackUrl)
-	mockDeadStatsD.Mock.AssertCalled(t, "Increment", handlers.DEAD_LETTER_WORKER+handlers.DISPATCH)
+	mockDeadStatsD.Mock.AssertCalled(t, "Increment", handlers.DEAD_LETTER_QUEUE+handlers.WORKER+handlers.DISPATCH)
 }
 
 func TestHandleItemDispatchesEventDoesNotRetry(t *testing.T) {
@@ -130,7 +130,7 @@ func TestHandleItemWithErrorStateAddsToDeadLetterQueue(t *testing.T) {
 	deadWorker.HandleItem(deadLetter)
 
 	mockDeadDal.Mock.AssertCalled(t, "UpsertDeadLetterItem", deadLetter)
-	mockDeadStatsD.Mock.AssertCalled(t, "Increment", handlers.DEAD_LETTER_WORKER+handlers.PROCESS_REDELIVERY)
+	mockDeadStatsD.Mock.AssertCalled(t, "Increment", handlers.DEAD_LETTER_QUEUE+handlers.WORKER+handlers.PROCESS_REDELIVERY)
 }
 
 func TestHandleItemWithErrorStateWithExceededRetryCountDoesNotReAdd(t *testing.T) {
@@ -159,7 +159,7 @@ func TestHandleItemWithErrorStateWithExceededRetryCountDeletesRegisteredEndpoint
 	deadWorker.HandleItem(deadLetter)
 
 	mockDeadDal.Mock.AssertNumberOfCalls(t, "DeleteRegistration", 1)
-	mockDeadStatsD.Mock.AssertCalled(t, "Increment", handlers.DEAD_LETTER_WORKER+handlers.DELETE_REGISTRATION)
+	mockDeadStatsD.Mock.AssertCalled(t, "Increment", handlers.DEAD_LETTER_QUEUE+handlers.WORKER+handlers.DELETE_REGISTRATION)
 }
 
 func TestHandleItemWithUndeliverableDeletesRegisteredEndpoint(t *testing.T) {
@@ -174,5 +174,5 @@ func TestHandleItemWithUndeliverableDeletesRegisteredEndpoint(t *testing.T) {
 	deadWorker.HandleItem(deadLetter)
 
 	mockDeadDal.Mock.AssertNumberOfCalls(t, "DeleteRegistration", 1)
-	mockDeadStatsD.Mock.AssertCalled(t, "Increment", handlers.DEAD_LETTER_WORKER+handlers.DELETE_REGISTRATION)
+	mockDeadStatsD.Mock.AssertCalled(t, "Increment", handlers.DEAD_LETTER_QUEUE+handlers.WORKER+handlers.DELETE_REGISTRATION)
 }

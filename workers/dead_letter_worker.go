@@ -27,7 +27,7 @@ func NewDeadLetterWorker(eventDispatcher EventDispatcher, dal data.Dal, log *log
 func (w *DeadLetterWorker) HandleItem(item interface{}) error {
 	deadLetter := item.(*entities.DeadLetterItem)
 	w.log.Printf("%vProcessing event: %v for: %v\n", DQWTAGNAME, deadLetter.Event.EventName, deadLetter.CallbackUrl)
-	w.statsD.Increment(handlers.DEAD_LETTER_WORKER + handlers.HANDLE)
+	w.statsD.Increment(handlers.DEAD_LETTER_QUEUE + handlers.WORKER + handlers.HANDLE)
 
 	registration, err := w.dal.GetRegistrationByEventAndCallback(deadLetter.Event.EventName, deadLetter.CallbackUrl)
 
@@ -40,14 +40,14 @@ func (w *DeadLetterWorker) HandleItem(item interface{}) error {
 			break
 		case 404:
 			w.deleteRegistration(registration) // endpoint does not exist delete endpoint
-			w.statsD.Increment(handlers.DEAD_LETTER_WORKER + handlers.DELETE_REGISTRATION)
+			w.statsD.Increment(handlers.DEAD_LETTER_QUEUE + handlers.WORKER + handlers.DELETE_REGISTRATION)
 			break
 		case 200:
-			w.statsD.Increment(handlers.DEAD_LETTER_WORKER + handlers.DISPATCH)
+			w.statsD.Increment(handlers.DEAD_LETTER_QUEUE + handlers.WORKER + handlers.DISPATCH)
 			break
 		}
 	} else {
-		w.statsD.Increment(handlers.DEAD_LETTER_WORKER + handlers.NO_ENDPOINT)
+		w.statsD.Increment(handlers.DEAD_LETTER_QUEUE + handlers.WORKER + handlers.NO_ENDPOINT)
 	}
 	return nil
 }
@@ -56,11 +56,11 @@ func (w *DeadLetterWorker) processRedelivery(deadLetter *entities.DeadLetterItem
 	if deadLetter.FailureCount < len(global.Config.RetryIntervals) {
 		w.log.Printf("%vQueue for redelivery: %v for: %v\n", DQWTAGNAME, deadLetter.Event.EventName, deadLetter.CallbackUrl)
 		w.queueForRedelivery(deadLetter)
-		w.statsD.Increment(handlers.DEAD_LETTER_WORKER + handlers.PROCESS_REDELIVERY)
+		w.statsD.Increment(handlers.DEAD_LETTER_QUEUE + handlers.WORKER + handlers.PROCESS_REDELIVERY)
 	} else {
 		w.log.Printf("%vDelete registration: %v for: %v\n", DQWTAGNAME, deadLetter.Event.EventName, deadLetter.CallbackUrl)
 		w.deleteRegistration(registration)
-		w.statsD.Increment(handlers.DEAD_LETTER_WORKER + handlers.DELETE_REGISTRATION)
+		w.statsD.Increment(handlers.DEAD_LETTER_QUEUE + handlers.WORKER + handlers.DELETE_REGISTRATION)
 	}
 }
 
