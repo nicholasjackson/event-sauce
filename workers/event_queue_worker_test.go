@@ -8,6 +8,7 @@ import (
 
 	"github.com/nicholasjackson/event-sauce/entities"
 	"github.com/nicholasjackson/event-sauce/global"
+	"github.com/nicholasjackson/event-sauce/handlers"
 	"github.com/nicholasjackson/event-sauce/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -16,6 +17,7 @@ import (
 var mockDispatcher *mocks.MockEventDispatcher
 var mockDal *mocks.MockDal
 var mockQueue *mocks.MockQueue
+var mockStatsD *mocks.MockStatsD
 var worker *EventQueueWorker
 var registrations []*entities.Registration
 
@@ -27,7 +29,8 @@ func setupTests(t *testing.T) {
 	mockDispatcher = &mocks.MockEventDispatcher{}
 	mockDal = &mocks.MockDal{}
 	mockQueue = &mocks.MockQueue{}
-	worker = New(mockDispatcher, mockDal, mockQueue, log.New(os.Stdout, "Testing: ", log.Lshortfile))
+	mockStatsD = &mocks.MockStatsD{}
+	worker = New(mockDispatcher, mockDal, mockQueue, log.New(os.Stdout, "Testing: ", log.Lshortfile), mockStatsD)
 	registrations = []*entities.Registration{&entities.Registration{CallbackUrl: "myendpoint"}}
 
 	global.Config.RetryIntervals = []string{"1d"}
@@ -38,6 +41,7 @@ func setupTests(t *testing.T) {
 	mockDal.Mock.On("UpsertEventStore", mock.Anything).Return(nil)
 	mockDal.Mock.On("UpsertDeadLetterItem", mock.Anything).Return(nil)
 	mockQueue.Mock.On("AddEvent", mock.Anything, mock.Anything).Return(nil)
+	mockStatsD.Mock.On("Increment", mock.Anything).Return()
 }
 
 func TestSetsEventDispatcherAndDal(t *testing.T) {
@@ -54,6 +58,7 @@ func TestHandleEventSavesToEventStore(t *testing.T) {
 	_ = worker.HandleItem(event)
 
 	mockDal.Mock.AssertCalled(t, "UpsertEventStore", mock.Anything)
+	mockStatsD.Mock.AssertCalled(t, "Increment", handlers.EVENT_QUEUE_WORKER+handlers.HANDLE)
 }
 
 func TestHandleEventAttemptsToDispatchEvent(t *testing.T) {
@@ -64,6 +69,7 @@ func TestHandleEventAttemptsToDispatchEvent(t *testing.T) {
 	_ = worker.HandleItem(event)
 
 	mockDispatcher.Mock.AssertCalled(t, "DispatchEvent", event, endpoint)
+	mockStatsD.Mock.AssertCalled(t, "Increment", handlers.EVENT_QUEUE_WORKER+handlers.DISPATCH)
 }
 
 func TestHandleEventAttemptsToDispatchMultipleEvent(t *testing.T) {
@@ -101,6 +107,7 @@ func TestDispatchEventFailureRemovesRegistrationWhenRegistrationFoundAndEndpoint
 	_ = worker.HandleItem(event)
 
 	mockDal.Mock.AssertCalled(t, "DeleteRegistration", registrations[0])
+	mockStatsD.Mock.AssertCalled(t, "Increment", handlers.EVENT_QUEUE_WORKER+handlers.DELETE_REGISTRATION)
 }
 
 func TestDispatchEventFailureAddsEventToDeadLetterQueueWhenEndpointInErrorState(t *testing.T) {
@@ -114,6 +121,7 @@ func TestDispatchEventFailureAddsEventToDeadLetterQueueWhenEndpointInErrorState(
 	_ = worker.HandleItem(event)
 
 	mockQueue.Mock.AssertNumberOfCalls(t, "AddEvent", 1)
+	mockStatsD.Mock.AssertCalled(t, "Increment", handlers.EVENT_QUEUE_WORKER+handlers.PROCESS_REDELIVERY)
 }
 
 func TestDispatchEventOKDoesNothing(t *testing.T) {
@@ -124,4 +132,5 @@ func TestDispatchEventOKDoesNothing(t *testing.T) {
 
 	mockDal.Mock.AssertNumberOfCalls(t, "DeleteRegistration", 0)
 	mockQueue.Mock.AssertNumberOfCalls(t, "AddEvent", 0)
+	mockStatsD.Mock.AssertCalled(t, "Increment", handlers.EVENT_QUEUE_WORKER+handlers.DISPATCH)
 }

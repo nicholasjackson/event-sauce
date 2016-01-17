@@ -9,6 +9,7 @@ import (
 
 	"github.com/nicholasjackson/event-sauce/entities"
 	"github.com/nicholasjackson/event-sauce/global"
+	"github.com/nicholasjackson/event-sauce/handlers"
 	"github.com/nicholasjackson/event-sauce/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -16,6 +17,7 @@ import (
 
 var mockDeadDispatcher *mocks.MockEventDispatcher
 var mockDeadDal *mocks.MockDal
+var mockDeadStatsD *mocks.MockStatsD
 var deadWorker *DeadLetterWorker
 var deadReg []*entities.Registration
 
@@ -34,7 +36,8 @@ func getDeadRegistration() *entities.Registration {
 func setupDeadTests(t *testing.T) {
 	mockDeadDispatcher = &mocks.MockEventDispatcher{}
 	mockDeadDal = &mocks.MockDal{}
-	deadWorker = NewDeadLetterWorker(mockDeadDispatcher, mockDeadDal, log.New(os.Stdout, "testing: ", log.Lshortfile))
+	mockDeadStatsD = &mocks.MockStatsD{}
+	deadWorker = NewDeadLetterWorker(mockDeadDispatcher, mockDeadDal, log.New(os.Stdout, "testing: ", log.Lshortfile), mockDeadStatsD)
 	deadReg = []*entities.Registration{&entities.Registration{CallbackUrl: "myendpoint"}}
 
 	global.Config.RetryIntervals = []string{"1d", "2d", "5d"}
@@ -45,6 +48,7 @@ func setupDeadTests(t *testing.T) {
 	mockDeadDal.Mock.On("DeleteRegistration", mock.Anything).Return(nil)
 	mockDeadDal.Mock.On("UpsertEventStore", mock.Anything).Return(nil)
 	mockDeadDal.Mock.On("UpsertDeadLetterItem", mock.Anything).Return(nil)
+	mockDeadStatsD.Mock.On("Increment", mock.Anything).Return()
 }
 
 func TestHandleItemDoesNothingIfNoRegisteredEndpoint(t *testing.T) {
@@ -58,6 +62,8 @@ func TestHandleItemDoesNothingIfNoRegisteredEndpoint(t *testing.T) {
 	deadWorker.HandleItem(deadLetter)
 
 	mockDeadDispatcher.Mock.AssertNotCalled(t, "DispatchEvent", mock.Anything, mock.Anything)
+	mockDeadStatsD.Mock.AssertCalled(t, "Increment", handlers.DEAD_LETTER_WORKER+handlers.HANDLE)
+	mockDeadStatsD.Mock.AssertCalled(t, "Increment", handlers.DEAD_LETTER_WORKER+handlers.NO_ENDPOINT)
 }
 
 func TestHandleItemDispatchesEvent(t *testing.T) {
@@ -69,6 +75,7 @@ func TestHandleItemDispatchesEvent(t *testing.T) {
 	deadWorker.HandleItem(deadLetter)
 
 	mockDeadDispatcher.Mock.AssertCalled(t, "DispatchEvent", mock.Anything, deadLetter.CallbackUrl)
+	mockDeadStatsD.Mock.AssertCalled(t, "Increment", handlers.DEAD_LETTER_WORKER+handlers.DISPATCH)
 }
 
 func TestHandleItemDispatchesEventDoesNotRetry(t *testing.T) {
@@ -123,6 +130,7 @@ func TestHandleItemWithErrorStateAddsToDeadLetterQueue(t *testing.T) {
 	deadWorker.HandleItem(deadLetter)
 
 	mockDeadDal.Mock.AssertCalled(t, "UpsertDeadLetterItem", deadLetter)
+	mockDeadStatsD.Mock.AssertCalled(t, "Increment", handlers.DEAD_LETTER_WORKER+handlers.PROCESS_REDELIVERY)
 }
 
 func TestHandleItemWithErrorStateWithExceededRetryCountDoesNotReAdd(t *testing.T) {
@@ -151,6 +159,7 @@ func TestHandleItemWithErrorStateWithExceededRetryCountDeletesRegisteredEndpoint
 	deadWorker.HandleItem(deadLetter)
 
 	mockDeadDal.Mock.AssertNumberOfCalls(t, "DeleteRegistration", 1)
+	mockDeadStatsD.Mock.AssertCalled(t, "Increment", handlers.DEAD_LETTER_WORKER+handlers.DELETE_REGISTRATION)
 }
 
 func TestHandleItemWithUndeliverableDeletesRegisteredEndpoint(t *testing.T) {
@@ -165,4 +174,5 @@ func TestHandleItemWithUndeliverableDeletesRegisteredEndpoint(t *testing.T) {
 	deadWorker.HandleItem(deadLetter)
 
 	mockDeadDal.Mock.AssertNumberOfCalls(t, "DeleteRegistration", 1)
+	mockDeadStatsD.Mock.AssertCalled(t, "Increment", handlers.DEAD_LETTER_WORKER+handlers.DELETE_REGISTRATION)
 }

@@ -7,24 +7,27 @@ import (
 	"github.com/nicholasjackson/event-sauce/data"
 	"github.com/nicholasjackson/event-sauce/entities"
 	"github.com/nicholasjackson/event-sauce/global"
+	"github.com/nicholasjackson/event-sauce/handlers"
+	"github.com/transform/api-users/logging"
 )
 
 type DeadLetterWorker struct {
 	eventDispatcher EventDispatcher
 	dal             data.Dal
 	log             *log.Logger
+	statsD          logging.StatsD
 }
 
 const DQWTAGNAME = "DeadLetterQueueWorker: "
 
-func NewDeadLetterWorker(eventDispatcher EventDispatcher, dal data.Dal, log *log.Logger) *DeadLetterWorker {
-	return &DeadLetterWorker{eventDispatcher: eventDispatcher, dal: dal, log: log}
+func NewDeadLetterWorker(eventDispatcher EventDispatcher, dal data.Dal, log *log.Logger, statsD logging.StatsD) *DeadLetterWorker {
+	return &DeadLetterWorker{eventDispatcher: eventDispatcher, dal: dal, log: log, statsD: statsD}
 }
 
 func (w *DeadLetterWorker) HandleItem(item interface{}) error {
 	deadLetter := item.(*entities.DeadLetterItem)
-
 	w.log.Printf("%vProcessing event: %v for: %v\n", DQWTAGNAME, deadLetter.Event.EventName, deadLetter.CallbackUrl)
+	w.statsD.Increment(handlers.DEAD_LETTER_WORKER + handlers.HANDLE)
 
 	registration, err := w.dal.GetRegistrationByEventAndCallback(deadLetter.Event.EventName, deadLetter.CallbackUrl)
 
@@ -37,8 +40,14 @@ func (w *DeadLetterWorker) HandleItem(item interface{}) error {
 			break
 		case 404:
 			w.deleteRegistration(registration) // endpoint does not exist delete endpoint
+			w.statsD.Increment(handlers.DEAD_LETTER_WORKER + handlers.DELETE_REGISTRATION)
+			break
+		case 200:
+			w.statsD.Increment(handlers.DEAD_LETTER_WORKER + handlers.DISPATCH)
 			break
 		}
+	} else {
+		w.statsD.Increment(handlers.DEAD_LETTER_WORKER + handlers.NO_ENDPOINT)
 	}
 	return nil
 }
@@ -47,9 +56,11 @@ func (w *DeadLetterWorker) processRedelivery(deadLetter *entities.DeadLetterItem
 	if deadLetter.FailureCount < len(global.Config.RetryIntervals) {
 		w.log.Printf("%vQueue for redelivery: %v for: %v\n", DQWTAGNAME, deadLetter.Event.EventName, deadLetter.CallbackUrl)
 		w.queueForRedelivery(deadLetter)
+		w.statsD.Increment(handlers.DEAD_LETTER_WORKER + handlers.PROCESS_REDELIVERY)
 	} else {
 		w.log.Printf("%vDelete registration: %v for: %v\n", DQWTAGNAME, deadLetter.Event.EventName, deadLetter.CallbackUrl)
 		w.deleteRegistration(registration)
+		w.statsD.Increment(handlers.DEAD_LETTER_WORKER + handlers.DELETE_REGISTRATION)
 	}
 }
 

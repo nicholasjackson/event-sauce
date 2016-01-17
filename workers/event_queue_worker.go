@@ -5,7 +5,9 @@ import (
 
 	"github.com/nicholasjackson/event-sauce/data"
 	"github.com/nicholasjackson/event-sauce/entities"
+	"github.com/nicholasjackson/event-sauce/handlers"
 	"github.com/nicholasjackson/event-sauce/queue"
+	"github.com/transform/api-users/logging"
 )
 
 type EventQueueWorker struct {
@@ -13,15 +15,18 @@ type EventQueueWorker struct {
 	dal             data.Dal
 	deadLetterQueue queue.Queue
 	log             *log.Logger
+	statsD          logging.StatsD
 }
 
 const EQWTAGNAME = "EventQueueWorker: "
 
-func New(eventDispatcher EventDispatcher, dal data.Dal, deadLetterQueue queue.Queue, log *log.Logger) *EventQueueWorker {
-	return &EventQueueWorker{eventDispatcher: eventDispatcher, dal: dal, deadLetterQueue: deadLetterQueue, log: log}
+func New(eventDispatcher EventDispatcher, dal data.Dal, deadLetterQueue queue.Queue, log *log.Logger, statsD logging.StatsD) *EventQueueWorker {
+	return &EventQueueWorker{eventDispatcher: eventDispatcher, dal: dal, deadLetterQueue: deadLetterQueue, log: log, statsD: statsD}
 }
 
 func (m *EventQueueWorker) HandleItem(item interface{}) error {
+	m.statsD.Increment(handlers.EVENT_QUEUE_WORKER + handlers.HANDLE)
+
 	event := item.(*entities.Event)
 	_ = m.saveEventToStore(event)
 
@@ -44,13 +49,16 @@ func (m *EventQueueWorker) processEvent(event *entities.Event, registration *ent
 	case 404:
 		m.log.Println(EQWTAGNAME, "processEvent: Not Found")
 		m.deleteRegistration(registration)
+		m.statsD.Increment(handlers.EVENT_QUEUE_WORKER + handlers.DELETE_REGISTRATION)
 		break
 	case 200:
 		m.log.Println(EQWTAGNAME, "processEvent: Dispatched OK")
+		m.statsD.Increment(handlers.EVENT_QUEUE_WORKER + handlers.DISPATCH)
 		break
 	default:
 		m.log.Println(EQWTAGNAME, "processEvent: Not healthy")
 		m.addToDeadLetterQueue(event, registration.CallbackUrl)
+		m.statsD.Increment(handlers.EVENT_QUEUE_WORKER + handlers.PROCESS_REDELIVERY)
 		break
 	}
 }
