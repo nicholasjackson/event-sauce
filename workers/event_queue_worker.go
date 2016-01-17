@@ -33,6 +33,7 @@ func (m *EventQueueWorker) HandleItem(item interface{}) error {
 	registrations, _ := m.dal.GetRegistrationsByEvent(event.EventName)
 
 	if len(registrations) < 1 {
+		m.log.Printf("%vNo registered endpoint for: %v\n", EQWTAGNAME, event.EventName)
 		m.statsD.Increment(handlers.EVENT_QUEUE + handlers.WORKER + handlers.NO_ENDPOINT)
 		return nil
 	}
