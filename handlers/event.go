@@ -24,11 +24,10 @@ type EventDependencies struct {
 
 var EventHandlerDependencies *EventDependencies = &EventDependencies{}
 
-const EVENT_HANDLER_CALLED = "eventsauce.event_handler.post"
 const EHTAGNAME = "EventHandler: "
 
 func EventHandler(rw http.ResponseWriter, r *http.Request) {
-	EventHandlerDependencies.Stats.Increment(EVENT_HANDLER_CALLED)
+	EventHandlerDependencies.Stats.Increment(EVENT_HANDLER + POST + CALLED)
 	EventHandlerDependencies.Log.Printf("%vHandler Called POST\n", EHTAGNAME)
 
 	defer r.Body.Close()
@@ -37,19 +36,21 @@ func EventHandler(rw http.ResponseWriter, r *http.Request) {
 
 	err := json.Unmarshal(data, &request)
 	if err != nil || request.EventName == "" || len(request.Payload) < 1 {
+		EventHandlerDependencies.Stats.Increment(EVENT_HANDLER + POST + BAD_REQUEST)
 		http.Error(rw, "Invalid request object", http.StatusBadRequest)
 		return
 	}
 
 	if err = EventHandlerDependencies.Queue.Add(request.EventName, string(request.Payload)); err != nil {
+		EventHandlerDependencies.Stats.Increment(EVENT_HANDLER + POST + ERROR)
 		http.Error(rw, "Error adding item to queue", http.StatusInternalServerError)
 		return
 	} else {
+		EventHandlerDependencies.Stats.Increment(EVENT_HANDLER + POST + SUCCESS)
 		var response BaseResponse
 		response.StatusEvent = "OK"
 
 		encoder := json.NewEncoder(rw)
 		encoder.Encode(&response)
-
 	}
 }

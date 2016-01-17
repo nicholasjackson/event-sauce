@@ -1,3 +1,5 @@
+
+
 def self.wait_until_server_running server, count
   begin
     response = RestClient.send("get", "#{server}/v1/health")

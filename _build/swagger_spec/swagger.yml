@@ -68,7 +68,7 @@ paths:
             $ref: '#/definitions/Response'
         '400':
           description: Bad request, possible invalid request object
-        '404':
+        '304':
           description: Registration does not exist
   /event:
     post:

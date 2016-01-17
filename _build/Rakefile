@@ -1,8 +1,7 @@
 require 'pathname'
 require 'docker'
-require 'consul/client'
 require 'yaml'
-
+require 'rest-client'
 require_relative 'libs/docker'
 require_relative 'libs/consul'
 require_relative 'libs/helpers'

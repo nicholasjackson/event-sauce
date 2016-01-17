@@ -79,5 +79,5 @@ Scenario: Delete registration with correct data when not registration exists ret
 	Given I send a DELETE request to "/v1/register" with the following:
 		| event_name | testevent.register                   |
 		| callback_url | http://something.something/v1/callback |
-	Then the response status should be "404"
+	Then the response status should be "304"
 	And 0 registrations should exist

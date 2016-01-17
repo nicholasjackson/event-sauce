@@ -25,12 +25,10 @@ type RegisterDependencies struct {
 
 var RegisterHandlerDependencies *RegisterDependencies = &RegisterDependencies{}
 
-const REGISTER_CREATE_HANDLER_CALLED = "eventsauce.register_handler.post"
-const REGISTER_DELETE_HANDLER_CALLED = "eventsauce.register_handler.delete"
 const RHTAGNAME = "RegisterHandler: "
 
 func RegisterCreateHandler(rw http.ResponseWriter, r *http.Request) {
-	RegisterHandlerDependencies.Stats.Increment(REGISTER_CREATE_HANDLER_CALLED)
+	RegisterHandlerDependencies.Stats.Increment(REGISTER_HANDLER + POST + CALLED)
 	RegisterHandlerDependencies.Log.Printf("%vHandler Called POST\n", RHTAGNAME)
 
 	defer r.Body.Close()
@@ -39,6 +37,7 @@ func RegisterCreateHandler(rw http.ResponseWriter, r *http.Request) {
 
 	err := json.Unmarshal(data, &request)
 	if err != nil || request.EventName == "" || request.CallbackUrl == "" {
+		RegisterHandlerDependencies.Stats.Increment(REGISTER_HANDLER + POST + BAD_REQUEST)
 		http.Error(rw, "Invalid request object", http.StatusBadRequest)
 		return
 	}
@@ -48,9 +47,12 @@ func RegisterCreateHandler(rw http.ResponseWriter, r *http.Request) {
 		registration := entities.CreateNewRegistration(request.EventName, request.CallbackUrl)
 		_ = RegisterHandlerDependencies.Dal.UpsertRegistration(&registration)
 	} else {
+		RegisterHandlerDependencies.Stats.Increment(REGISTER_HANDLER + POST + NOT_FOUND)
 		http.Error(rw, "Registration not modified", http.StatusNotModified)
+		return
 	}
 
+	RegisterHandlerDependencies.Stats.Increment(REGISTER_HANDLER + POST + SUCCESS)
 	var response BaseResponse
 	response.StatusEvent = "OK"
 
@@ -59,7 +61,7 @@ func RegisterCreateHandler(rw http.ResponseWriter, r *http.Request) {
 }
 
 func RegisterDeleteHandler(rw http.ResponseWriter, r *http.Request) {
-	RegisterHandlerDependencies.Stats.Increment(REGISTER_DELETE_HANDLER_CALLED)
+	RegisterHandlerDependencies.Stats.Increment(REGISTER_HANDLER + DELETE + CALLED)
 	RegisterHandlerDependencies.Log.Printf("%vHandler Called DELETE\n", RHTAGNAME)
 
 	defer r.Body.Close()
@@ -68,6 +70,7 @@ func RegisterDeleteHandler(rw http.ResponseWriter, r *http.Request) {
 
 	err := json.Unmarshal(data, &request)
 	if err != nil || request.EventName == "" || request.CallbackUrl == "" {
+		RegisterHandlerDependencies.Stats.Increment(REGISTER_HANDLER + DELETE + BAD_REQUEST)
 		http.Error(rw, "Invalid request object", http.StatusBadRequest)
 		return
 	}
@@ -75,16 +78,20 @@ func RegisterDeleteHandler(rw http.ResponseWriter, r *http.Request) {
 	if r, _ := RegisterHandlerDependencies.Dal.GetRegistrationByEventAndCallback(
 		request.EventName, request.CallbackUrl); r != nil {
 		if err = RegisterHandlerDependencies.Dal.DeleteRegistration(r); err != nil {
+			RegisterHandlerDependencies.Stats.Increment(REGISTER_HANDLER + DELETE + ERROR)
 			http.Error(rw, "Unable to delete request object", http.StatusInternalServerError)
 			return
 		}
 
+		RegisterHandlerDependencies.Stats.Increment(REGISTER_HANDLER + DELETE + SUCCESS)
 		var response BaseResponse
 		response.StatusEvent = "OK"
 
 		encoder := json.NewEncoder(rw)
 		encoder.Encode(&response)
 	} else {
-		http.Error(rw, "Registration not found", http.StatusNotFound)
+		RegisterHandlerDependencies.Stats.Increment(REGISTER_HANDLER + DELETE + NOT_FOUND)
+		http.Error(rw, "Registration not found", http.StatusNotModified)
+		return
 	}
 }

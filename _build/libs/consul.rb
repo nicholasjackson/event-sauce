@@ -1,18 +1,20 @@
 def setConsulVariables server, configfile
   puts "Setting Consul key values for server: #{server}"
 
-
   yaml = YAML.load_file(configfile)
   config = []
   process_yaml("", yaml).each {|k| config << k}
 
   config.each do |c|
-    if c[:v].is_a?(Array)
+    case c[:v]
+    when Array
       value = c[:v].to_json
-    else
+    when String
+      value = c[:v].gsub(/\n/, '\n')
+    when Fixnum, TrueClass
       value = c[:v]
     end
-    puts `curl -X PUT -d '#{value}' http://#{server}:9500/v1/kv#{c[:k]}`
+    `curl -X PUT -d '#{value}' http://#{server}:9500/v1/kv#{c[:k]}`
   end
 end
 

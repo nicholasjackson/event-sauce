@@ -53,7 +53,7 @@ func TestRegisterCreateCallsStatsD(t *testing.T) {
 
 	RegisterCreateHandler(&responseRecorder, &request)
 
-	mockRegisterDeps.StatsMock.Mock.AssertCalled(t, "Increment", REGISTER_CREATE_HANDLER_CALLED)
+	mockRegisterDeps.StatsMock.Mock.AssertCalled(t, "Increment", REGISTER_HANDLER+POST+CALLED)
 }
 
 func TestRegisterCreateWithNoPayloadReturnsBadRequest(t *testing.T) {
@@ -66,6 +66,7 @@ func TestRegisterCreateWithNoPayloadReturnsBadRequest(t *testing.T) {
 	RegisterCreateHandler(&responseRecorder, &request)
 
 	assert.Equal(t, 400, responseRecorder.Code)
+	mockRegisterDeps.StatsMock.Mock.AssertCalled(t, "Increment", REGISTER_HANDLER+POST+BAD_REQUEST)
 }
 
 func TestRegisterCreateWithNoEventNameReturnsBadRequest(t *testing.T) {
@@ -81,6 +82,7 @@ func TestRegisterCreateWithNoEventNameReturnsBadRequest(t *testing.T) {
 	RegisterCreateHandler(&responseRecorder, &request)
 
 	assert.Equal(t, 400, responseRecorder.Code)
+	mockRegisterDeps.StatsMock.Mock.AssertCalled(t, "Increment", REGISTER_HANDLER+POST+BAD_REQUEST)
 }
 
 func TestRegisterCreateWithNoCallbackUrlReturnsBadRequest(t *testing.T) {
@@ -96,6 +98,7 @@ func TestRegisterCreateWithNoCallbackUrlReturnsBadRequest(t *testing.T) {
 	RegisterCreateHandler(&responseRecorder, &request)
 
 	assert.Equal(t, 400, responseRecorder.Code)
+	mockRegisterDeps.StatsMock.Mock.AssertCalled(t, "Increment", REGISTER_HANDLER+POST+BAD_REQUEST)
 }
 
 func TestRegisterCreateWithValidRequestSavesDataWhenRegistrationDoesNotExist(t *testing.T) {
@@ -114,6 +117,7 @@ func TestRegisterCreateWithValidRequestSavesDataWhenRegistrationDoesNotExist(t *
 
 	mockRegisterDeps.DalMock.Mock.AssertNumberOfCalls(t, "UpsertRegistration", 1)
 	assert.Equal(t, 200, responseRecorder.Code)
+	mockRegisterDeps.StatsMock.Mock.AssertCalled(t, "Increment", REGISTER_HANDLER+POST+SUCCESS)
 }
 
 func TestRegisterCreateWithValidRequestCreatesValidRegistration(t *testing.T) {
@@ -152,6 +156,7 @@ func TestRegisterCreateWithValidRequestDoesNotSaveDataWhenRegistrationExists(t *
 
 	mockRegisterDeps.DalMock.Mock.AssertNumberOfCalls(t, "UpsertRegistration", 0)
 	assert.Equal(t, 304, responseRecorder.Code)
+	mockRegisterDeps.StatsMock.Mock.AssertCalled(t, "Increment", REGISTER_HANDLER+POST+NOT_FOUND)
 }
 
 func TestRegisterDeleteCallsStatsD(t *testing.T) {
@@ -163,7 +168,7 @@ func TestRegisterDeleteCallsStatsD(t *testing.T) {
 
 	RegisterDeleteHandler(&responseRecorder, &request)
 
-	mockRegisterDeps.StatsMock.Mock.AssertCalled(t, "Increment", REGISTER_DELETE_HANDLER_CALLED)
+	mockRegisterDeps.StatsMock.Mock.AssertCalled(t, "Increment", REGISTER_HANDLER+DELETE+CALLED)
 }
 
 func TestRegisterDeleteWithNoPayloadReturnsBadRequest(t *testing.T) {
@@ -176,6 +181,7 @@ func TestRegisterDeleteWithNoPayloadReturnsBadRequest(t *testing.T) {
 	RegisterDeleteHandler(&responseRecorder, &request)
 
 	assert.Equal(t, 400, responseRecorder.Code)
+	mockRegisterDeps.StatsMock.Mock.AssertCalled(t, "Increment", REGISTER_HANDLER+DELETE+BAD_REQUEST)
 }
 
 func TestRegisterDeleteWithNoEventNameReturnsBadRequest(t *testing.T) {
@@ -191,6 +197,7 @@ func TestRegisterDeleteWithNoEventNameReturnsBadRequest(t *testing.T) {
 	RegisterDeleteHandler(&responseRecorder, &request)
 
 	assert.Equal(t, 400, responseRecorder.Code)
+	mockRegisterDeps.StatsMock.Mock.AssertCalled(t, "Increment", REGISTER_HANDLER+DELETE+BAD_REQUEST)
 }
 
 func TestRegisterDeleteWithNoCallbackUrlReturnsBadRequest(t *testing.T) {
@@ -206,6 +213,7 @@ func TestRegisterDeleteWithNoCallbackUrlReturnsBadRequest(t *testing.T) {
 	RegisterDeleteHandler(&responseRecorder, &request)
 
 	assert.Equal(t, 400, responseRecorder.Code)
+	mockRegisterDeps.StatsMock.Mock.AssertCalled(t, "Increment", REGISTER_HANDLER+DELETE+BAD_REQUEST)
 }
 
 func TestRegisterDeleteWithValidRequestReturns404WhenRegistrationDoesNotExist(t *testing.T) {
@@ -226,7 +234,8 @@ func TestRegisterDeleteWithValidRequestReturns404WhenRegistrationDoesNotExist(t 
 	RegisterDeleteHandler(&responseRecorder, &request)
 
 	mockRegisterDeps.DalMock.Mock.AssertNumberOfCalls(t, "DeleteRegistration", 0)
-	assert.Equal(t, 404, responseRecorder.Code)
+	assert.Equal(t, 304, responseRecorder.Code)
+	mockRegisterDeps.StatsMock.Mock.AssertCalled(t, "Increment", REGISTER_HANDLER+DELETE+NOT_FOUND)
 }
 
 func TestRegisterDeleteWithValidRequestDeletesRegistration(t *testing.T) {
@@ -249,4 +258,5 @@ func TestRegisterDeleteWithValidRequestDeletesRegistration(t *testing.T) {
 
 	assert.Equal(t, 200, responseRecorder.Code)
 	mockRegisterDeps.DalMock.Mock.AssertCalled(t, "DeleteRegistration", registration)
+	mockRegisterDeps.StatsMock.Mock.AssertCalled(t, "Increment", REGISTER_HANDLER+DELETE+SUCCESS)
 }

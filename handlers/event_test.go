@@ -51,7 +51,7 @@ func TestEventCallsStatsD(t *testing.T) {
 
 	EventHandler(&responseRecorder, &request)
 
-	mockEventDeps.StatsMock.Mock.AssertCalled(t, "Increment", EVENT_HANDLER_CALLED)
+	mockEventDeps.StatsMock.Mock.AssertCalled(t, "Increment", EVENT_HANDLER+POST+CALLED)
 }
 
 func TestEventWithNoPayloadReturns400(t *testing.T) {
@@ -67,6 +67,7 @@ func TestEventWithNoPayloadReturns400(t *testing.T) {
 	EventHandler(&responseRecorder, &request)
 
 	assert.Equal(t, 400, responseRecorder.Code)
+	mockEventDeps.StatsMock.Mock.AssertCalled(t, "Increment", EVENT_HANDLER+POST+BAD_REQUEST)
 }
 
 func TestEventWithNoEventNameReturns400(t *testing.T) {
@@ -82,6 +83,7 @@ func TestEventWithNoEventNameReturns400(t *testing.T) {
 	EventHandler(&responseRecorder, &request)
 
 	assert.Equal(t, 400, responseRecorder.Code)
+	mockEventDeps.StatsMock.Mock.AssertCalled(t, "Increment", EVENT_HANDLER+POST+BAD_REQUEST)
 }
 
 func TestEventWithValidEventReturns200(t *testing.T) {
@@ -98,6 +100,7 @@ func TestEventWithValidEventReturns200(t *testing.T) {
 	EventHandler(&responseRecorder, &request)
 
 	assert.Equal(t, 200, responseRecorder.Code)
+	mockEventDeps.StatsMock.Mock.AssertCalled(t, "Increment", EVENT_HANDLER+POST+SUCCESS)
 }
 
 func TestEventWithValidEventAddsToQueue(t *testing.T) {
