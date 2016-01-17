@@ -56,5 +56,5 @@ func TestHealthHandlerSetStats(t *testing.T) {
 
 	HealthHandler(&responseRecorder, &request)
 
-	mockHealthDeps.StatsMock.Mock.AssertCalled(t, "Increment", HEALTH_HANDLER_CALLED)
+	mockHealthDeps.StatsMock.Mock.AssertCalled(t, "Increment", HEALTH_HANDLER+GET+CALLED)
 }
