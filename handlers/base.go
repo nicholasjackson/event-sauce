@@ -5,6 +5,7 @@ type BaseResponse struct {
 }
 
 const (
+	GET                 = ".get"
 	POST                = ".post"
 	PUT                 = ".put"
 	DELETE              = ".delete"
@@ -23,8 +24,9 @@ const (
 	INVALID_TOKEN       = ".auth.invalid_token"
 	NOT_AUTHORISED      = ".auth.not_authorised"
 	TOKEN_OK            = ".auth.token_ok"
-	EVENT_HANDLER       = "eventsauce.event_handler"
-	REGISTER_HANDLER    = "eventsauce.register_handler"
+	HEALTH_HANDLER      = "eventsauce.health"
+	EVENT_HANDLER       = "eventsauce.event"
+	REGISTER_HANDLER    = "eventsauce.register"
 	EVENT_QUEUE_WORKER  = "eventsauce.event_queue_worker"
 	DEAD_LETTER_WORKER  = "eventsauce.dead_letter_worker"
 )

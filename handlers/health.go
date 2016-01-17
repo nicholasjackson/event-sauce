@@ -16,12 +16,11 @@ type HealthDependencies struct {
 
 var HealthHandlerDependencies *HealthDependencies = &HealthDependencies{}
 
-const HEALTH_HANDLER_CALLED = "eventsauce.health_handler.get"
 const HHTAGNAME = "HealthHandler: "
 
 func HealthHandler(rw http.ResponseWriter, r *http.Request) {
 	// all HealthHandlerDependencies are automatically created by injection process
-	HealthHandlerDependencies.Stats.Increment(HEALTH_HANDLER_CALLED)
+	HealthHandlerDependencies.Stats.Increment(HEALTH_HANDLER + GET + CALLED)
 	HealthHandlerDependencies.Log.Printf("%vHandler Called GET\n", HHTAGNAME)
 
 	var response BaseResponse
