@@ -34,7 +34,8 @@ func (r *RedisQueue) AddEvent(event *entities.Event, callback string) error {
 		// handle error
 		return err
 	}
-	fmt.Println("AddEvent:", string(payloadBytes))
+
+	fmt.Println("Add event to queue:", string(payloadBytes))
 	r.Queue.PublishBytes(payloadBytes)
 
 	return nil
@@ -48,12 +49,12 @@ func (r *RedisQueue) StartConsuming(size int, pollInterval time.Duration, callba
 
 // Interface from rmq
 func (r *RedisQueue) Consume(delivery rmq.Delivery) {
-	fmt.Println("Event Delivered:", delivery.Payload())
+	fmt.Println("Got event from queue:", delivery.Payload())
 
 	event := entities.Event{}
 
 	if err := json.Unmarshal([]byte(delivery.Payload()), &event); err != nil {
-		fmt.Println("Unable to deserialise event")
+		fmt.Println("Error consuming event, unable to deserialise event")
 		// handle error
 		delivery.Reject()
 		return
