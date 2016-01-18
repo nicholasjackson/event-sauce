@@ -39,9 +39,9 @@ func (m *MockDal) GetRegistrationsByEvent(event string) ([]*entities.Registratio
 func (m *MockDal) GetRegistrationByEventAndCallback(event string, callback_url string) (*entities.Registration, error) {
 	args := m.Mock.Called(event, callback_url)
 	if args.Get(0) != nil {
-		f, ok := args.Get(0).(func() *entities.Registration)
+		f, ok := args.Get(0).(func() (*entities.Registration, error))
 		if ok {
-			return f(), args.Error(1)
+			return f()
 		} else {
 			return args.Get(0).(*entities.Registration), args.Error(1)
 		}

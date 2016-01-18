@@ -20,16 +20,17 @@ var mockDeadDal *mocks.MockDal
 var mockDeadStatsD *mocks.MockStatsD
 var deadWorker *DeadLetterWorker
 var deadReg []*entities.Registration
+var deadError error
 
 func getDeadRegistrations() []*entities.Registration {
 	return deadReg
 }
 
-func getDeadRegistration() *entities.Registration {
+func getDeadRegistration() (*entities.Registration, error) {
 	if len(deadReg) > 0 {
-		return deadReg[0]
+		return deadReg[0], deadError
 	} else {
-		return nil
+		return nil, deadError
 	}
 }
 
@@ -39,12 +40,13 @@ func setupDeadTests(t *testing.T) {
 	mockDeadStatsD = &mocks.MockStatsD{}
 	deadWorker = NewDeadLetterWorker(mockDeadDispatcher, mockDeadDal, log.New(os.Stdout, "testing: ", log.Lshortfile), mockDeadStatsD)
 	deadReg = []*entities.Registration{&entities.Registration{CallbackUrl: "myendpoint"}}
+	deadError = nil
 
 	global.Config.RetryIntervals = []string{"1d", "2d", "5d"}
 
 	mockDeadDispatcher.Mock.On("DispatchEvent", mock.Anything, mock.Anything).Return(200, nil)
 	mockDeadDal.Mock.On("GetRegistrationsByEvent", mock.Anything).Return(getDeadRegistrations, nil)
-	mockDeadDal.Mock.On("GetRegistrationByEventAndCallback", mock.Anything, mock.Anything).Return(getDeadRegistration, nil)
+	mockDeadDal.Mock.On("GetRegistrationByEventAndCallback", mock.Anything, mock.Anything).Return(getDeadRegistration)
 	mockDeadDal.Mock.On("DeleteRegistration", mock.Anything).Return(nil)
 	mockDeadDal.Mock.On("UpsertEventStore", mock.Anything).Return(nil)
 	mockDeadDal.Mock.On("UpsertDeadLetterItem", mock.Anything).Return(nil)
@@ -56,7 +58,7 @@ func TestHandleItemDoesNothingIfNoRegisteredEndpoint(t *testing.T) {
 
 	event := entities.Event{EventName: "mytestevent"}
 	deadLetter := &entities.DeadLetterItem{Event: event, CallbackUrl: "myurl"}
-
+	deadError = fmt.Errorf("Not found")
 	deadReg = []*entities.Registration{}
 
 	deadWorker.HandleItem(deadLetter)
