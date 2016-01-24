@@ -1,35 +1,4 @@
-require 'pathname'
-require 'docker'
-require 'yaml'
-require 'rest-client'
-require_relative 'libs/docker'
-require_relative 'libs/consul'
-require_relative 'libs/helpers'
+require 'go_builder'
 
-require_relative 'rake-modules/app'
-
-REGISTRY_URL = ENV['DOCKER_REGISTRY_URL']
-REGISTRY_USER = ENV['DOCKER_REGISTRY_USER']
-REGISTRY_PASS = ENV['DOCKER_REGISTRY_PASS']
-REGISTRY_EMAIL = ENV['DOCKER_REGISTRY_EMAIL']
-
-DOCKER_NAMESPACE = ENV['DOCKER_NAMESPACE']
-DOCKER_IMAGE_NAME = 'event-sauce'
-
-GOPATH = ENV["GOPATH"]
-GOCMD = "/usr/local/go/bin/go"
-GONAMESPACE = 'github.com/nicholasjackson'
-
-ROOTFOLDER = Pathname.new(Dir.pwd).parent
-
-GO_CONTAINER_ARGS = {
-	:image => 'golang:latest',
-	:binds => [
-		"#{GOPATH}/src:/go/src"
-	],
-	:env => [
-		'CGO_ENABLED=0' # needed to build alpine compatible go binaries
-	],
-	:working_directory => "/go/src/#{GONAMESPACE}/#{DOCKER_IMAGE_NAME}",
-	:command => ['/bin/bash']
-}
+spec = Gem::Specification.find_by_name 'go_builder'
+Rake.add_rakelib "#{spec.gem_dir}/lib/go_builder/rake"

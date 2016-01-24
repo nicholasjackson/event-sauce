@@ -16,9 +16,9 @@ ADD config.ctmpl /event-sauce/config.ctmpl
 # Add server files
 RUN mkdir /swagger
 ADD swagger_spec/swagger.yml /swagger/swagger.yml
-ADD server /event-sauce/server
+ADD event-sauce /event-sauce/event-sauce
 
-RUN chmod 755 /event-sauce/server
+RUN chmod 755 /event-sauce/event-sauce
 
 ENTRYPOINT ["/usr/bin/s6-svscan","/etc/s6"]
 CMD []
