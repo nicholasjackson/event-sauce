@@ -25,7 +25,7 @@ run:
 cucumber:
   consul_loader:
     enabled: true
-    config_file: './config_keys.yml'
+    config_file: './consul_keys.yml'
     url: <%= "http://#{ENV['DOCKER_IP']}:9500" %>
   health_check:
     enabled: true
