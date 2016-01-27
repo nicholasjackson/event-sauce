@@ -2,7 +2,6 @@
 go:
   namespace: 'github.com/nicholasjackson'
   application_name: 'event-sauce'
-  comand: '/usr/local/go/bin/go'
 docker_registry:
   url: <%= ENV['DOCKER_REGISTRY_URL'] %>
   user: <%= ENV['DOCKER_REGISTRY_USER'] %>

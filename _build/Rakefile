@@ -1,4 +1,4 @@
-require 'go_builder'
+require 'minke'
 
-spec = Gem::Specification.find_by_name 'go_builder'
-Rake.add_rakelib "#{spec.gem_dir}/lib/go_builder/rake"
+spec = Gem::Specification.find_by_name 'minke'
+Rake.add_rakelib "#{spec.gem_dir}/lib/minke/rake"
