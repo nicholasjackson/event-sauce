@@ -1,6 +1,6 @@
-# event-sauce
+# Sorcery
 NOTES:
-Event Sauce is an open source distributed server for Event Sourcing, it performs the role of event store and pub sub queue using REST
+Sorcery is an open source distributed server for event sourcing, it performs the role of event store and pub sub queue using REST
 
 ## This document is work in progress the current API spec can be found at the below location
 [https://github.com/nicholasjackson/event-sauce/blob/master/_build/swagger_spec/index.html](http://htmlpreview.github.io/?https://github.com/nicholasjackson/event-sauce/blob/master/_build/swagger_spec/index.html)
