@@ -1,3 +1,0 @@
-#!/bin/sh
-
-exec /usr/bin/consul-template -consul=$CONSUL -template "/event-sauce/config.ctmpl:/event-sauce/config.json:killall server"

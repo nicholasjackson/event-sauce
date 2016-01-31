@@ -8,11 +8,11 @@ import (
 	"time"
 
 	"github.com/facebookgo/inject"
-	"github.com/nicholasjackson/event-sauce/entities"
-	"github.com/nicholasjackson/event-sauce/global"
-	"github.com/nicholasjackson/event-sauce/handlers"
-	"github.com/nicholasjackson/event-sauce/mocks"
-	"github.com/nicholasjackson/event-sauce/workers"
+	"github.com/nicholasjackson/sorcery/entities"
+	"github.com/nicholasjackson/sorcery/global"
+	"github.com/nicholasjackson/sorcery/handlers"
+	"github.com/nicholasjackson/sorcery/mocks"
+	"github.com/nicholasjackson/sorcery/workers"
 	"github.com/stretchr/testify/mock"
 )
 

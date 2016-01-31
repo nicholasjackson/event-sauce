@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/nicholasjackson/event-sauce/logging"
+	"github.com/nicholasjackson/sorcery/logging"
 )
 
 type HealthDependencies struct {

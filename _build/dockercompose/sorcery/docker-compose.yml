@@ -1,5 +1,5 @@
-eventsauce:
-  image: event-sauce
+sorcery:
+  image: sorcery
   ports:
     - "8001:8001"
   environment:

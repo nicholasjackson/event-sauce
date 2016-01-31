@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"sync"
 
-	"github.com/nicholasjackson/event-sauce/handlers"
+	"github.com/nicholasjackson/sorcery/handlers"
 )
 
 func startApiServer(wg *sync.WaitGroup) {

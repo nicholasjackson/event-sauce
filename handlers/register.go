@@ -6,9 +6,9 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/nicholasjackson/event-sauce/data"
-	"github.com/nicholasjackson/event-sauce/entities"
-	"github.com/nicholasjackson/event-sauce/logging"
+	"github.com/nicholasjackson/sorcery/data"
+	"github.com/nicholasjackson/sorcery/entities"
+	"github.com/nicholasjackson/sorcery/logging"
 )
 
 type RegisterRequest struct {

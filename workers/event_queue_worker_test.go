@@ -6,10 +6,10 @@ import (
 	"os"
 	"testing"
 
-	"github.com/nicholasjackson/event-sauce/entities"
-	"github.com/nicholasjackson/event-sauce/global"
-	"github.com/nicholasjackson/event-sauce/handlers"
-	"github.com/nicholasjackson/event-sauce/mocks"
+	"github.com/nicholasjackson/sorcery/entities"
+	"github.com/nicholasjackson/sorcery/global"
+	"github.com/nicholasjackson/sorcery/handlers"
+	"github.com/nicholasjackson/sorcery/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )

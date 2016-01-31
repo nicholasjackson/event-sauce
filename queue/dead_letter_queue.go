@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/nicholasjackson/event-sauce/data"
-	"github.com/nicholasjackson/event-sauce/entities"
-	"github.com/nicholasjackson/event-sauce/global"
+	"github.com/nicholasjackson/sorcery/data"
+	"github.com/nicholasjackson/sorcery/entities"
+	"github.com/nicholasjackson/sorcery/global"
 )
 
 type DeadLetterQueue struct {

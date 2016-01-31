@@ -107,7 +107,7 @@ PLATFORMS
 DEPENDENCIES
   cucumber (~> 1.3.10)
   cucumber-mailcatcher (~> 0.12)
-  cucumber-rest-api
+  cucumber-rest-api (= 0.3)
   minke (~> 0.7)
   pickle-mongodb (~> 0.5)
   pry (~> 0.10.3)

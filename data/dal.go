@@ -1,6 +1,6 @@
 package data
 
-import "github.com/nicholasjackson/event-sauce/entities"
+import "github.com/nicholasjackson/sorcery/entities"
 
 type Dal interface {
 	GetRegistrationsByEvent(event string) ([]*entities.Registration, error)

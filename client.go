@@ -5,11 +5,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/nicholasjackson/event-sauce/global"
-	"github.com/nicholasjackson/event-sauce/handlers"
-	"github.com/nicholasjackson/event-sauce/logging"
-	"github.com/nicholasjackson/event-sauce/queue"
-	"github.com/nicholasjackson/event-sauce/workers"
+	"github.com/nicholasjackson/sorcery/global"
+	"github.com/nicholasjackson/sorcery/handlers"
+	"github.com/nicholasjackson/sorcery/logging"
+	"github.com/nicholasjackson/sorcery/queue"
+	"github.com/nicholasjackson/sorcery/workers"
 )
 
 type ClientDependencies struct {

@@ -3,10 +3,10 @@ package workers
 import (
 	"log"
 
-	"github.com/nicholasjackson/event-sauce/data"
-	"github.com/nicholasjackson/event-sauce/entities"
-	"github.com/nicholasjackson/event-sauce/handlers"
-	"github.com/nicholasjackson/event-sauce/queue"
+	"github.com/nicholasjackson/sorcery/data"
+	"github.com/nicholasjackson/sorcery/entities"
+	"github.com/nicholasjackson/sorcery/handlers"
+	"github.com/nicholasjackson/sorcery/queue"
 	"github.com/transform/api-users/logging"
 )
 

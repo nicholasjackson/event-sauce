@@ -1,3 +1,0 @@
-#!/bin/sh
-
-exec /event-sauce/event-sauce /event-sauce/config.json /event-sauce

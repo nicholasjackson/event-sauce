@@ -1,0 +1,3 @@
+#!/bin/sh
+
+exec /usr/bin/consul-template -consul=$CONSUL -template "/sorcery/config.ctmpl:/sorcery/config.json:killall sorcery"

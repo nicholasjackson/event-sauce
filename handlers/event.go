@@ -6,8 +6,8 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/nicholasjackson/event-sauce/logging"
-	"github.com/nicholasjackson/event-sauce/queue"
+	"github.com/nicholasjackson/sorcery/logging"
+	"github.com/nicholasjackson/sorcery/queue"
 )
 
 type EventRequest struct {

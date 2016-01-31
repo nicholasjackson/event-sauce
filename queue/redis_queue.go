@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/adjust/rmq"
-	"github.com/nicholasjackson/event-sauce/entities"
+	"github.com/nicholasjackson/sorcery/entities"
 )
 
 type RedisQueue struct {

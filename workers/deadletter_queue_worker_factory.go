@@ -3,7 +3,7 @@ package workers
 import (
 	"log"
 
-	"github.com/nicholasjackson/event-sauce/data"
+	"github.com/nicholasjackson/sorcery/data"
 	"github.com/transform/api-users/logging"
 )
 

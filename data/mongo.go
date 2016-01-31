@@ -8,7 +8,7 @@ import (
 	"labix.org/v2/mgo"
 	"labix.org/v2/mgo/bson"
 
-	"github.com/nicholasjackson/event-sauce/entities"
+	"github.com/nicholasjackson/sorcery/entities"
 )
 
 type MongoDal struct {

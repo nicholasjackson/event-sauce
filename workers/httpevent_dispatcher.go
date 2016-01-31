@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/nicholasjackson/event-sauce/entities"
+	"github.com/nicholasjackson/sorcery/entities"
 )
 
 type HTTPEventDispatcher struct {

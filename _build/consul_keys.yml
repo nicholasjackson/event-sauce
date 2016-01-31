@@ -1,5 +1,5 @@
 api:
-  eventsauce:
+  sorcery:
     stats_d_server_url: 'statsd:8125'
     data_store:
       connection_string: 'mongodb://mongo/event-sauce'

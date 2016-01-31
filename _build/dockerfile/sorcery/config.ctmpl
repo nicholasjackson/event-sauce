@@ -1,0 +1,13 @@
+{
+  "stats_d_server_url": "{{key "/api/sorcery/stats_d_server_url"}}",
+  "data_store": {
+    "connection_string": "{{key "/api/sorcery/data_store/connection_string"}}",
+    "database_name": "{{key "/api/sorcery/data_store/database_name"}}"
+  },
+  "queue": {
+    "connection_string": "{{key "/api/sorcery/queue/connection_string"}}",
+    "event_queue": "{{key "/api/sorcery/queue/event_queue"}}",
+    "dead_letter_queue": "{{key "/api/sorcery/queue/dead_letter_queue"}}"
+  },
+  "retry_intervals": {{key "/api/sorcery/retry_intervals"}}
+}

@@ -1,7 +1,7 @@
 ---
 go:
   namespace: 'github.com/nicholasjackson'
-  application_name: 'event-sauce'
+  application_name: 'sorcery'
 docker_registry:
   url: <%= ENV['DOCKER_REGISTRY_URL'] %>
   user: <%= ENV['DOCKER_REGISTRY_USER'] %>
@@ -9,13 +9,13 @@ docker_registry:
   email: <%= ENV['DOCKER_REGISTRY_EMAIL'] %>
   namespace: <%= ENV['DOCKER_NAMESPACE'] %>
 docker:
-  docker_file: './dockerfile/event-sauce/'
-  compose_file: './dockercompose/event-sauce/docker-compose.yml'
+  docker_file: './dockerfile/sorcery/'
+  compose_file: './dockercompose/sorcery/docker-compose.yml'
   build_args:
     image: 'golang:latest'
     env:
       - 'CGO_ENABLED=0' # used for alpine linux static linking
-    working_directory: '/go/src/github.com/nicholasjackson/event-sauce'
+    working_directory: '/go/src/github.com/nicholasjackson/sorcery'
 run:
   consul_loader:
     enabled: true
@@ -32,8 +32,8 @@ cucumber:
 after_build:
   copy_assets:
     -
-      from: <%= "#{ENV['GOPATH']}/src/github.com/nicholasjackson/event-sauce/event-sauce" %>
-      to: './dockerfile/event-sauce'
+      from: <%= "#{ENV['GOPATH']}/src/github.com/nicholasjackson/sorcery/sorcery" %>
+      to: './dockerfile/sorcery'
     -
       from: './swagger_spec/swagger.yml'
-      to: './dockerfile/event-sauce/swagger_spec'
+      to: './dockerfile/sorcery/swagger_spec'

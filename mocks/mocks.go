@@ -3,7 +3,7 @@ package mocks
 import (
 	"time"
 
-	"github.com/nicholasjackson/event-sauce/entities"
+	"github.com/nicholasjackson/sorcery/entities"
 	"github.com/stretchr/testify/mock"
 )
 

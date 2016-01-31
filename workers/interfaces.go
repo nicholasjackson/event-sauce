@@ -1,6 +1,6 @@
 package workers
 
-import "github.com/nicholasjackson/event-sauce/entities"
+import "github.com/nicholasjackson/sorcery/entities"
 
 type Worker interface {
 	HandleItem(item interface{}) error
