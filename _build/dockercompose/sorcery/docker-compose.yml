@@ -29,6 +29,8 @@ mongo:
     - '27017:27017'
   volumes_from:
     - data
+  environment:
+    - "SERVICE_27017_NAME=mongo-27017"
 redis:
   image: 'redis:latest'
   ports:
@@ -41,7 +43,16 @@ statsd:
     - "2003:2003"
     - "8125:8125/udp"
     - "8126:8126"
+  environment:
+    - "SERVICE_8125_NAME=statsd-8125"
 callbackserver:
   image: nicholasjackson/mimic-docker
   ports:
     - "11988:11988"
+registrator:
+  command: -internal -tags=dev consul://consul:8500
+  image: gliderlabs/registrator:latest
+  volumes:
+    - "/var/run/docker.sock:/tmp/docker.sock"
+  links:
+    - consul

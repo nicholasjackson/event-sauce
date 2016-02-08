@@ -1,11 +1,8 @@
 api:
   sorcery:
-    stats_d_server_url: 'statsd:8125'
     data_store:
-      connection_string: 'mongodb://mongo/event-sauce'
       database_name: 'event-sauce'
     queue:
-      connection_string: 'redis:6379'
       event_queue: 'event_queue'
       dead_letter_queue: 'dead_letter_queue'
     retry_intervals:

@@ -1,11 +1,11 @@
 {
-  "stats_d_server_url": "{{key "/api/sorcery/stats_d_server_url"}}",
+  "stats_d_server_url": "{{range service "statsd-8125"}}{{.Address}}:{{.Port}}{{end}}",
   "data_store": {
-    "connection_string": "{{key "/api/sorcery/data_store/connection_string"}}",
+    "connection_string": "mongodb://{{range service "mongo-27017"}}{{.Address}}{{end}}/{{key "/api/sorcery/data_store/database_name"}}",
     "database_name": "{{key "/api/sorcery/data_store/database_name"}}"
   },
   "queue": {
-    "connection_string": "{{key "/api/sorcery/queue/connection_string"}}",
+    "connection_string": "{{range service "redis-6379"}}{{.Address}}:{{.Port}}{{end}}",
     "event_queue": "{{key "/api/sorcery/queue/event_queue"}}",
     "dead_letter_queue": "{{key "/api/sorcery/queue/dead_letter_queue"}}"
   },

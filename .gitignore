@@ -18,10 +18,9 @@ _cgo_gotypes.go
 _cgo_export.*
 
 # binaries
-sorcery
+/sorcery
+_build/dockerfile/sorcery/sorcery
 
 # other
 .DS_Store
-_build/dockerfile/event-sauce/swagger_spec
-!_build/dockercompose/sorcery
-!_build/dockerfile/sorcery
+_build/dockerfile/sorcery/swagger_spec

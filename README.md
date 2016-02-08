@@ -5,6 +5,11 @@ Sorcery is an open source distributed server for event sourcing, it performs the
 ## This document is work in progress the current API spec can be found at the below location
 [https://github.com/nicholasjackson/sorcery/blob/master/_build/swagger_spec/index.html](http://htmlpreview.github.io/?https://github.com/nicholasjackson/sorcery/blob/master/_build/swagger_spec/index.html)
 
+# Configuration
+For building Sorcery into a container we use consul and consul-template to supply the defaults.  
+
+CONSUL=consul:8500
+
 The system is made up of a server and either one or more workers.
 
 Server:
