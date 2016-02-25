@@ -6,8 +6,8 @@ import (
 	"github.com/nicholasjackson/sorcery/data"
 	"github.com/nicholasjackson/sorcery/entities"
 	"github.com/nicholasjackson/sorcery/handlers"
+	"github.com/nicholasjackson/sorcery/logging"
 	"github.com/nicholasjackson/sorcery/queue"
-	"github.com/transform/api-users/logging"
 )
 
 type EventQueueWorker struct {

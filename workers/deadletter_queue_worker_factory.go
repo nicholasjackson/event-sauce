@@ -4,7 +4,7 @@ import (
 	"log"
 
 	"github.com/nicholasjackson/sorcery/data"
-	"github.com/transform/api-users/logging"
+	"github.com/nicholasjackson/sorcery/logging"
 )
 
 type DeadLetterQueueWorkerFactory struct {

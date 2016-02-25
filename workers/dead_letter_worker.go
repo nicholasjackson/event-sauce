@@ -8,7 +8,7 @@ import (
 	"github.com/nicholasjackson/sorcery/entities"
 	"github.com/nicholasjackson/sorcery/global"
 	"github.com/nicholasjackson/sorcery/handlers"
-	"github.com/transform/api-users/logging"
+	"github.com/nicholasjackson/sorcery/logging"
 )
 
 type DeadLetterWorker struct {

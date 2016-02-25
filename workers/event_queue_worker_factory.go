@@ -4,8 +4,8 @@ import (
 	"log"
 
 	"github.com/nicholasjackson/sorcery/data"
+	"github.com/nicholasjackson/sorcery/logging"
 	"github.com/nicholasjackson/sorcery/queue"
-	"github.com/transform/api-users/logging"
 )
 
 type EventQueueWorkerFactory struct {
