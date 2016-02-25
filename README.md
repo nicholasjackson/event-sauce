@@ -1,4 +1,6 @@
 # Sorcery
+[![Circle CI](https://circleci.com/gh/nicholasjackson/sorcery.svg?style=svg)](https://circleci.com/gh/nicholasjackson/sorcery)  
+
 NOTES:
 Sorcery is an open source distributed server for event sourcing, it performs the role of event store and pub sub queue using REST
 

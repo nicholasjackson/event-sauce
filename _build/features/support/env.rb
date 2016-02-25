@@ -5,7 +5,7 @@ require 'cucumber/mailcatcher'
 
 $SERVER_PATH = "http://#{ENV['DOCKER_IP']}:8001"
 $REDIS_IP = ENV['DOCKER_IP']
-$REDIS_PORT = 6379
+$REDIS_PORT = 16379
 $MIMIC_SERVER = "http://#{ENV['DOCKER_IP']}:11988"
 
 Mongoid.load!('features/support/localdb.yml', :development)

@@ -26,7 +26,7 @@ data:
 mongo:
   image: 'mongo:latest'
   ports:
-    - '27017:27017'
+    - '37017:27017'
   volumes_from:
     - data
   environment:
@@ -34,8 +34,8 @@ mongo:
 redis:
   image: 'redis:latest'
   ports:
-    - '6380:6380'
-    - '6379:6379'
+    - '16380:6380'
+    - '16379:6379'
 statsd:
   image: 'hopsoft/graphite-statsd:latest'
   ports:
