@@ -1,7 +1,7 @@
 ---
-go:
-  namespace: 'github.com/nicholasjackson'
-  application_name: 'sorcery'
+namespace: 'github.com/nicholasjackson'
+application_name: 'sorcery'
+language: go
 docker_registry:
   url: <%= ENV['DOCKER_REGISTRY_URL'] %>
   user: <%= ENV['DOCKER_REGISTRY_USER'] %>
@@ -11,11 +11,6 @@ docker_registry:
 docker:
   docker_file: './dockerfile/sorcery/'
   compose_file: './dockercompose/sorcery/docker-compose.yml'
-  build_args:
-    image: 'golang:latest'
-    env:
-      - 'CGO_ENABLED=0' # used for alpine linux static linking
-    working_directory: '/go/src/github.com/nicholasjackson/sorcery'
 run:
   consul_loader:
     enabled: true

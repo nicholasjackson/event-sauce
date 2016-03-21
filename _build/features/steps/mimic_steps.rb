@@ -7,7 +7,6 @@ Given(/^Mimic is configured with specification$/) do |specification|
 end
 
 Then(/^I expect (\d+) callbacks to have been received with the correct payload$/) do |count|
-
   timer = 0
   while true
     requests = checkResponse

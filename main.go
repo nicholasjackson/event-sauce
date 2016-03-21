@@ -56,7 +56,7 @@ func setupInjection() {
 }
 
 func createStatsDClient() logging.StatsD {
-	statsDClient, err := statsd.New(global.Config.StatsDServerIP) // reference to a statsd client
+	statsDClient, err := statsd.New(statsd.Address(global.Config.StatsDServerIP)) // reference to a statsd client
 	if err != nil {
 		panic(fmt.Sprintln("Unable to create StatsD Client: ", err))
 	}
