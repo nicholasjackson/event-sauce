@@ -11,6 +11,7 @@ machine:
 dependencies:
   override:
     - cd _build && bundle
+    - cd _build && bundle update
     - mkdir -p /home/ubuntu/go/src/github.com/nicholasjackson
     - cp -R /home/ubuntu/sorcery /home/ubuntu/go/src/github.com/nicholasjackson/
 
