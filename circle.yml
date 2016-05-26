@@ -2,7 +2,7 @@ machine:
   pre:
     - curl -sSL https://s3.amazonaws.com/circle-downloads/install-circleci-docker.sh | bash -s -- 1.10.0
   ruby:
-    version: 2.2.4
+    version: 2.3.1
   services:
     - docker
   environment:
@@ -17,5 +17,5 @@ dependencies:
 
 test:
   override:
-    - cd /home/ubuntu/go/src/github.com/nicholasjackson/sorcery/_build && rake app:build_server
+    - cd /home/ubuntu/go/src/github.com/nicholasjackson/sorcery/_build && rake app:build_image
     - cd /home/ubuntu/go/src/github.com/nicholasjackson/sorcery/_build && rake app:cucumber
