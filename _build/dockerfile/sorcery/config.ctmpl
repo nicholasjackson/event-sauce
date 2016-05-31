@@ -1,5 +1,6 @@
 {
   "stats_d_server_url": "{{range service "statsd-8125"}}{{.Address}}:{{.Port}}{{end}}",
+  "syslog_url": "{{range service "syslog-514"}}{{.Address}}:{{.Port}}{{end}}",
   "data_store": {
     "connection_string": "mongodb://{{range service "mongo-27017"}}{{.Address}}{{end}}/{{key "/api/sorcery/data_store/database_name"}}",
     "database_name": "{{key "/api/sorcery/data_store/database_name"}}"

@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"log/syslog"
 	"os"
 	"sync"
 
@@ -100,5 +101,10 @@ func createDeadLetterQueueWorkerFactory() workers.WorkerFactory {
 }
 
 func createLogger() *log.Logger {
-	return log.New(os.Stdout, "EventSauce: ", log.Lshortfile)
+	syslogWriter, err := syslog.Dial("udp", global.Config.SysLogIP, syslog.LOG_SYSLOG, "sorcery")
+	if err != nil {
+		panic(err)
+	}
+
+	return log.New(syslogWriter, "EventSauce: ", log.Lshortfile)
 }

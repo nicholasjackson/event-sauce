@@ -12,6 +12,7 @@ services:
       - mongo:mongo
       - redis:redis
       - callbackserver:callbackserver
+      - syslog:syslog
   consul:
     image: 'progrium/consul:latest'
     ports:
@@ -47,6 +48,11 @@ services:
       - "8126:8126"
     environment:
       - "SERVICE_8125_NAME=statsd-8125"
+  syslog:
+    image: 'factorish/syslog'
+    command: '-t udp'
+    environment:
+      - "SERVICE_514_NAME=syslog-514"
   callbackserver:
     image: nicholasjackson/mimic-docker
     ports:

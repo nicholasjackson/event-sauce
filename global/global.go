@@ -10,6 +10,7 @@ import (
 
 type ConfigStruct struct {
 	StatsDServerIP string    `json:"stats_d_server_url"`
+	SysLogIP       string    `json:"syslog_url"`
 	RootFolder     string    `json:"root_folder"`
 	Data           DataStore `json:"data_store"`
 	Queue          Queue     `json:"queue"`
