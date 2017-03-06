@@ -1,0 +1,49 @@
+hash: d55c8e223bf6c0ead972871a019a2ad26a82757535ec42880447e5308637fa7a
+updated: 2017-03-06T17:59:04.460019906Z
+imports:
+- name: github.com/adjust/rmq
+  version: 4841bc90fe76d439a508533b53ebca450481ca15
+- name: github.com/adjust/uniuri
+  version: 498743145e60c272b71d377c4e456335e4ef7524
+- name: github.com/alexcesaro/statsd
+  version: 7fea3f0d2fab1ad973e641e51dba45443a311a90
+- name: github.com/davecgh/go-spew
+  version: 6d212800a42e8ab5c146b8ace3490ee17e5225f9
+  subpackages:
+  - spew
+- name: github.com/facebookgo/inject
+  version: cc1aa653e50f6a9893bcaef89e673e5b24e1e97b
+- name: github.com/facebookgo/structtag
+  version: 217e25fb96916cc60332e399c9aa63f5c422ceed
+- name: github.com/gorilla/context
+  version: 08b5f424b9271eedf6f9f0ce86cb9396ed337a42
+- name: github.com/gorilla/mux
+  version: 599cba5e7b6137d46ddf58fb1765f5d928e69604
+- name: github.com/gorilla/pat
+  version: cf955c3d1f2c27ee96f93e9738085c762ff5f49d
+- name: github.com/pmezard/go-difflib
+  version: d8ed2627bdf02c080bf22230dbb337003b7aba2d
+  subpackages:
+  - difflib
+- name: github.com/stretchr/objx
+  version: cbeaeb16a013161a98496fad62933b1d21786672
+- name: github.com/stretchr/testify
+  version: 69483b4bd14f5845b5a1e55bca19e954e827f1d0
+  subpackages:
+  - assert
+  - mock
+- name: gopkg.in/bsm/ratelimit.v1
+  version: db14e161995a5177acef654cb0dd785e8ee8bc22
+- name: gopkg.in/redis.v3
+  version: b5e368500d0a508ef8f16e9c2d4025a8a46bcc29
+  subpackages:
+  - internal
+  - internal/consistenthash
+  - internal/hashtag
+  - internal/pool
+- name: labix.org/v2/mgo
+  version: "287"
+  subpackages:
+  - bson
+  - sasl
+testImports: []

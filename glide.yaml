@@ -1,0 +1,14 @@
+package: github.com/nicholasjackson/sorcery
+import:
+- package: github.com/adjust/rmq
+- package: github.com/alexcesaro/statsd
+  version: ^2.0.0
+- package: github.com/facebookgo/inject
+- package: github.com/gorilla/pat
+- package: github.com/stretchr/testify
+  version: ^1.1.4
+  subpackages:
+  - mock
+- package: labix.org/v2/mgo
+  subpackages:
+  - bson

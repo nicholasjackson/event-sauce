@@ -19,8 +19,11 @@ _cgo_export.*
 
 # binaries
 /sorcery
-_build/dockerfile/sorcery/sorcery
+_minke/dockerfile/sorcery/sorcery
 
 # other
 .DS_Store
-_build/dockerfile/sorcery/swagger_spec
+_minke/dockerfile/sorcery/swagger_spec
+/vendor
+_minke/vendor
+

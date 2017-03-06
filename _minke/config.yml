@@ -9,7 +9,7 @@ docker_registry:
   email: <%= ENV['DOCKER_REGISTRY_EMAIL'] %>
   namespace: <%= ENV['DOCKER_NAMESPACE'] %>
 docker:
-  build_image: 'golang:latest'
+  build_image: 'nicholasjackson/minke-generator-go'
   application_docker_file: './dockerfile/sorcery/'
   application_compose_file: './dockercompose/sorcery/docker-compose.yml'
 fetch:
@@ -20,29 +20,27 @@ build:
   post:
     copy:
       -
-        from: '<%= ENV["GOPATH"] %>/src/github.com/nicholasjackson/sorcery/sorcery'
+        from: '../sorcery'
         to: './dockerfile/sorcery'
       -
         from: './swagger_spec/swagger.yml'
         to: './dockerfile/sorcery/swagger_spec'
 run:
-  pre:
-    consul_loader:
-      config_file: './consul_keys.yml'
-      url:
-        address: consul
-        port: 8500
-        type: private
+  consul_loader:
+    config_file: './consul_keys.yml'
+    url:
+      address: consul
+      port: 8500
+      type: bridge
 cucumber:
-  pre:
-    consul_loader:
-      config_file: './consul_keys.yml'
-      url:
-        address: consul
-        port: 8500
-        type: private
-    health_check:
-      address: sorcery
-      port: 8001
-      path: /v1/health
-      type: private
+  consul_loader:
+    config_file: './consul_keys.yml'
+    url:
+      address: consul
+      port: 8500
+      type: bridge
+  health_check:
+    address: sorcery
+    port: 8001
+    path: /v1/health
+    type: bridge

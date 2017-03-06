@@ -3,4 +3,4 @@ development:
     default:
       database: event-sauce
       hosts:
-        - <%= "#{ENV['DOCKER_IP']}:37017" %>
+        - <%= "#{$MONGO_SERVER}" %>
