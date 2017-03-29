@@ -21,6 +21,6 @@ dependencies:
 
 test:
   override:
-    - cd /home/ubuntu/go/src/github.com/nicholasjackson/sorcery/_build && rake app:build_image
-    - cd /home/ubuntu/go/src/github.com/nicholasjackson/sorcery/_build && rake app:cucumber
-    - cd /home/ubuntu/go/src/github.com/nicholasjackson/sorcery/_build && rake app:push
+    - cd /home/ubuntu/go/src/github.com/nicholasjackson/sorcery/_minke && ./minke -v build_image
+    - cd /home/ubuntu/go/src/github.com/nicholasjackson/sorcery/_minke && ./minke -v cucumber
+    - cd /home/ubuntu/go/src/github.com/nicholasjackson/sorcery/_build && ./minke -v push
